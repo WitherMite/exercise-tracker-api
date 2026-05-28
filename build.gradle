@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.0.6'
 	id 'io.spring.dependency-management' version '1.1.7'
+    id "org.jooq.jooq-codegen-gradle" version "3.21.4"
 }
 
 group = 'withermite'
@@ -23,13 +24,47 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.postgresql:postgresql:42.7.11'
+    implementation "org.jooq:jooq-postgres-extensions:3.21.4"
+    implementation "org.jooq:jooq:3.21.4"
 	testImplementation 'org.springframework.boot:spring-boot-starter-hateoas-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-jooq-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-security-test'
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    jooqCodegen 'org.postgresql:postgresql:42.7.11'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+Properties props = new Properties()
+props.load(new FileInputStream(rootProject.file("./src/main/resources/secrets.properties")))
+
+jooq {
+    configuration {
+        jdbc {
+            driver = "org.postgresql.Driver"
+            url = props.getProperty("spring.datasource.url")
+            user = props.getProperty("spring.datasource.username")
+            password = props.getProperty("spring.datasource.password")
+        }
+        generator {
+            database {
+                name = "org.jooq.meta.postgres.PostgresDatabase"
+                includes = ".*"
+            }
+            // Generation flags: See advanced configuration properties
+            generate {
+                springAnnotations = true
+                springDao = true
+                jooqVersionReference = false
+            }
+            target {
+                packageName = "org.jooq.exercise_tracker_model"
+                directory = "./src/main/java/"
+            }
+        }
+    }
+}
+
