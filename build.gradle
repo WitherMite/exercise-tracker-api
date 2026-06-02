@@ -38,16 +38,16 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-Properties props = new Properties()
-props.load(new FileInputStream(rootProject.file("./src/main/resources/secrets.properties")))
+Properties secrets = new Properties()
+secrets.load(new FileInputStream(rootProject.file("./src/main/resources/secrets.properties")))
 
 jooq {
     configuration {
         jdbc {
             driver = "org.postgresql.Driver"
-            url = props.getProperty("spring.datasource.url")
-            user = props.getProperty("spring.datasource.username")
-            password = props.getProperty("spring.datasource.password")
+            url = secrets.getProperty("spring.datasource.url")
+            user = secrets.getProperty("spring.datasource.username")
+            password = secrets.getProperty("spring.datasource.password")
         }
         generator {
             database {
@@ -60,11 +60,7 @@ jooq {
                 springDao = true
                 jooqVersionReference = false
             }
-            target {
-                packageName = "org.jooq.exercise_tracker_model"
-                directory = "./src/main/java/"
-            }
+            target {}
         }
     }
 }
-
