@@ -1,7 +1,8 @@
-package withermite.exercise_tracker_api.controllers;
+package withermite.exercise_tracker_api.user;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,21 +19,21 @@ class UsersController {
 
     @PostMapping
     public String add() {
-        return "add";
+        return "many";
     }
 
     @GetMapping("/{key}")
-    public String one() {
-        return "one";
+    public String one(@PathVariable Long key) {
+        return "" + key;
     }
 
     @PutMapping("/{key}")
-    public String update() {
-        return "update";
+    public String update(@PathVariable Long key) {
+        return "update" + key;
     }
 
     @DeleteMapping("/{key}")
-    public String delete() {
-        return "delete";
+    public String delete(@PathVariable Long key) {
+        return "delete" + key;
     }
 }

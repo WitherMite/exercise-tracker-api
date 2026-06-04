@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.controllers;
+package withermite.exercise_tracker_api.root;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
