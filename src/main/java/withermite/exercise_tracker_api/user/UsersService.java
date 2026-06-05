@@ -16,8 +16,22 @@ public class UsersService {
         return user;
     }
 
-    public User getOne(String username) {
-        var user = new User(username);
+    public User findOne(String username) {
+        User user = userRepository.one(username);
         return user;
+    }
+
+    public User[] findMany() {
+        User[] users = userRepository.many();
+        return users;
+    }
+
+    public User replace(String username, User user) {
+        userRepository.replace(username, user);
+        return user;
+    }
+
+    public void delete(String username) {
+        userRepository.delete(username);
     }
 }

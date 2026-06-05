@@ -19,8 +19,8 @@ class UsersController {
     }
 
     @GetMapping
-    public String many() {
-        return "many";
+    public User[] many() {
+        return usersService.findMany();
     }
 
     @PostMapping
@@ -30,16 +30,16 @@ class UsersController {
 
     @GetMapping("/{key}")
     public User one(@PathVariable String key) {
-        return usersService.getOne(key);
+        return usersService.findOne(key);
     }
 
     @PutMapping("/{key}")
-    public String update(@PathVariable String key) {
-        return "update" + key;
+    public User replace(@PathVariable String key, @RequestBody User user) {
+        return usersService.replace(key, user);
     }
 
     @DeleteMapping("/{key}")
-    public String delete(@PathVariable String key) {
-        return "delete" + key;
+    public void delete(@PathVariable String key) {
+        usersService.delete(key);
     }
 }
