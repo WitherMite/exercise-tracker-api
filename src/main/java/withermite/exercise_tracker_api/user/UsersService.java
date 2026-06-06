@@ -4,34 +4,33 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UsersService {
+    private final UsersRepository usersRepository;
 
-    private final UserRepository userRepository;
-
-    public UsersService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UsersService(UsersRepository userRepository) {
+        this.usersRepository = userRepository;
     }
 
-    public User create(User user) {
-        userRepository.save(user);
+    public <T> T create(T user) {
+        usersRepository.save(user);
         return user;
     }
 
     public User findOne(String username) {
-        User user = userRepository.one(username);
+        User user = usersRepository.one(username);
         return user;
     }
 
     public User[] findMany() {
-        User[] users = userRepository.many();
+        User[] users = usersRepository.many();
         return users;
     }
 
     public User replace(String username, User user) {
-        userRepository.replace(username, user);
+        usersRepository.replace(username, user);
         return user;
     }
 
     public void delete(String username) {
-        userRepository.delete(username);
+        usersRepository.delete(username);
     }
 }

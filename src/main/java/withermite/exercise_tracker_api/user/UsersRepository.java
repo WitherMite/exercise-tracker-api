@@ -3,8 +3,8 @@ package withermite.exercise_tracker_api.user;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserRepository {
-    public void save(User user) {
+public class UsersRepository {
+    public <U> void save(U user) {
         // save user to db
     }
 
