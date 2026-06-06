@@ -10,7 +10,7 @@ public class UsersService {
         this.usersRepository = userRepository;
     }
 
-    public <T> T create(T user) {
+    public User create(User user) {
         usersRepository.save(user);
         return user;
     }
@@ -26,8 +26,7 @@ public class UsersService {
     }
 
     public User replace(String username, User user) {
-        usersRepository.replace(username, user);
-        return user;
+        return usersRepository.replace(username, user);
     }
 
     public void delete(String username) {

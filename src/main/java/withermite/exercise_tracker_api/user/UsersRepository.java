@@ -4,7 +4,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class UsersRepository {
-    public <U> void save(U user) {
+    public void save(User user) {
         // save user to db
     }
 
@@ -25,7 +25,7 @@ public class UsersRepository {
 
     public User replace(String username, User user) {
         // replace all fields in db
-        return new User(username);
+        return user;
     }
 
     public void delete(String username) {
