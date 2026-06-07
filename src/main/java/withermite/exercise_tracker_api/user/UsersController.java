@@ -1,6 +1,7 @@
 package withermite.exercise_tracker_api.user;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,8 +38,15 @@ class UsersController {
     }
 
     @PutMapping("/{key}")
-    public User replace(@PathVariable String key, @RequestBody User user) {
-        return usersService.replace(key, user);
+    public ResponseEntity<User> replace(@PathVariable String key, @RequestBody User user) {
+        User replaced = usersService.replace(key, user);
+
+        if (replaced == null) {
+            User created = usersService.create(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        }
+
+        return ResponseEntity.ok(replaced);
     }
 
     @DeleteMapping("/{key}")

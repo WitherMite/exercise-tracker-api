@@ -6,6 +6,7 @@ import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,4 +112,27 @@ public class UserControllerTests {
     }
 
     // Edge cases
+
+    @Test
+    public void putCreatesNewUserWhenServiceCantReplace() {
+
+        String json = "{\"username\":\"frank\"}";
+        User user = new User("frank");
+
+        when(usersService.create(any(User.class))).thenReturn(new User("response"));
+
+        // responds with body from service create method, and created status
+        rest.put().uri("/users/frank")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(json)
+                .exchange().expectAll(
+                        r -> r.expectStatus().isCreated(),
+                        r -> r.expectBody().json("{\"username\":\"response\"}"));
+
+        // service recieves attempt to replace, but is no mock so fails
+        verify(usersService, times(1)).replace(eq("frank"), any(User.class));
+        // and user shaped like request json to create
+        verify(usersService).create(argument.capture());
+        assertEquals(user.username, argument.getValue().username);
+    }
 }
