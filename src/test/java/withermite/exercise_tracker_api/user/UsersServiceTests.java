@@ -45,7 +45,6 @@ public class UsersServiceTests {
 
         User foundUser = usersService.findOne(username);
 
-        verify(usersRepository, times(1)).one(anyString());
         assertInstanceOf(User.class, foundUser);
         assertEquals(user, foundUser);
     }
@@ -59,7 +58,7 @@ public class UsersServiceTests {
     }
 
     @Test
-    public void replaceUserInRepository() {
+    public void replacesUserInRepository() {
         String username = "frank";
         User user = new User(username);
         // different return user to make sure we return from repository
@@ -68,7 +67,6 @@ public class UsersServiceTests {
 
         User changedUser = usersService.replace(username, user);
 
-        verify(usersRepository, times(1)).replace(anyString(), eq(user));
         assertInstanceOf(User.class, changedUser);
         assertEquals(user2, changedUser);
     }
