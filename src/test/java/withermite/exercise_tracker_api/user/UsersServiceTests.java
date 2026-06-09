@@ -1,5 +1,6 @@
 package withermite.exercise_tracker_api.user;
 
+import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +15,7 @@ import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
 public class UsersServiceTests {
+    private AutoCloseable mocks;
 
     @Mock
     private UsersRepository usersRepository;
@@ -24,7 +26,13 @@ public class UsersServiceTests {
     @BeforeEach
     @SuppressWarnings("unused")
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        this.mocks = MockitoAnnotations.openMocks(this);
+    }
+
+    @AfterEach
+    @SuppressWarnings("unused")
+    void cleanUp() throws Exception {
+        this.mocks.close();
     }
 
     // Crud tests
