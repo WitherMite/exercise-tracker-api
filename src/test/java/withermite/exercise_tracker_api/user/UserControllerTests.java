@@ -30,7 +30,7 @@ public class UserControllerTests {
 
     // Crud requests
     @Test
-    public void getsUserFromService() throws Exception {
+    public void getsUserFromService() {
         String username = "frank";
         String displayname = "Frank";
         User user = new User(username, displayname);
@@ -45,7 +45,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void getsManyUsersFromService() throws Exception {
+    public void getsManyUsersFromService() {
         User[] users = {
                 new User("frank", "Frank"),
                 new User("bob", "Bob")
@@ -61,7 +61,7 @@ public class UserControllerTests {
     }
 
     @Test
-    public void postsUserToService() throws Exception {
+    public void postsUserToService() {
         String json = "{\"username\":\"frank\", \"displayname\":\"Frank\"}";
         User user = new User("frank", "Frank");
 
@@ -82,9 +82,8 @@ public class UserControllerTests {
     }
 
     @Test
-    public void putsUserToService() throws Exception {
+    public void putsUserToService() {
         String json = "{\"username\":\"frank\", \"displayname\":\"Frank\"}";
-        User user = new User("frank", "Frank");
 
         when(usersService.replace(eq("frank"), any(User.class))).thenReturn(new User("response", "Response"));
 
@@ -98,12 +97,33 @@ public class UserControllerTests {
 
         // service recieves user shaped like request json
         verify(usersService).replace(anyString(), argument.capture());
-        assertEquals(user.username, argument.getValue().username);
-        assertEquals(user.displayname, argument.getValue().displayname);
+        assertEquals("frank", argument.getValue().username);
+        assertEquals("Frank", argument.getValue().displayname);
     }
 
     @Test
-    public void deletesUserThroughService() throws Exception {
+    public void patchesUserThroughService() {
+        String json = "{\"username\":\"frank\", \"weight\": 65.33}";
+
+        when(usersService.update(eq("frank"), any(User.class))).thenReturn(new User("response", null));
+
+        // responds with body from service
+        rest.patch().uri("/users/frank")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(json)
+                .exchange().expectAll(
+                        r -> r.expectStatus().isOk(),
+                        r -> r.expectBody().json("{\"username\":\"response\"}"));
+
+        // service recieves user shaped like request json
+        verify(usersService).update(anyString(), argument.capture());
+        assertEquals("frank", argument.getValue().username);
+        assertEquals(65.33d, argument.getValue().weight);
+
+    }
+
+    @Test
+    public void deletesUserThroughService() {
         String username = "frank";
 
         rest.delete().uri("/users/{username}", username)
@@ -117,9 +137,8 @@ public class UserControllerTests {
     // Edge cases
 
     @Test
-    public void putCreatesNewUserWhenServiceCantReplace() throws Exception {
+    public void putCreatesNewUserWhenServiceCantReplace() {
         String json = "{\"username\":\"frank\", \"displayname\":\"Frank\"}";
-        User user = new User("frank", "Frank");
 
         when(usersService.create(any(User.class))).thenReturn(new User("response", "Response"));
 
@@ -135,7 +154,7 @@ public class UserControllerTests {
         verify(usersService, times(1)).replace(eq("frank"), any(User.class));
         // and user shaped like request json to create
         verify(usersService).create(argument.capture());
-        assertEquals(user.username, argument.getValue().username);
-        assertEquals(user.displayname, argument.getValue().displayname);
+        assertEquals("frank", argument.getValue().username);
+        assertEquals("Frank", argument.getValue().displayname);
     }
 }

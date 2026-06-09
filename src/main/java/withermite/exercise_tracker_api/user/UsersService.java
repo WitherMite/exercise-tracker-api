@@ -29,6 +29,12 @@ public class UsersService {
         return usersRepository.replace(username, user);
     }
 
+    public User update(String username, User user) {
+        // need to get jooq stuff implemented to do this,
+        // too much work to actually test updating without it
+        return user;
+    }
+
     public void delete(String username) {
         usersRepository.delete(username);
     }

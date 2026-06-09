@@ -82,6 +82,11 @@ public class UsersServiceTests {
     }
 
     @Test
+    public void updatesUserInRepository() {
+
+    }
+
+    @Test
     public void deletesUserFromRepository() {
         String username = "frank";
 

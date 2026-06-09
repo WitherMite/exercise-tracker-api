@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -47,6 +48,11 @@ class UsersController {
         }
 
         return ResponseEntity.ok(replaced);
+    }
+
+    @PatchMapping("/{key}")
+    public User update(@PathVariable String key, @RequestBody User user) {
+        return usersService.update(key, user);
     }
 
     @DeleteMapping("/{key}")
