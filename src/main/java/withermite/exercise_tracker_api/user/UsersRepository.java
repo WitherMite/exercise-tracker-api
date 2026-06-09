@@ -10,15 +10,15 @@ public class UsersRepository {
 
     public User one(String username) {
         // get from db
-        return new User(username);
+        return new User(username, "displayname");
     }
 
     public User[] many() {
         // get from db
         User[] users = {
-                new User("1"),
-                new User("2"),
-                new User("3"),
+                new User("1", "one"),
+                new User("2", "two"),
+                new User("3", "three"),
         };
         return users;
     }

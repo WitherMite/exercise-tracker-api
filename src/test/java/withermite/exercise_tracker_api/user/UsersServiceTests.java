@@ -30,7 +30,7 @@ public class UsersServiceTests {
     // Crud tests
     @Test
     public void savesUserInRepository() {
-        User testUser = new User("frank");
+        User testUser = new User("frank", "Frank");
 
         usersService.create(testUser);
 
@@ -40,7 +40,8 @@ public class UsersServiceTests {
     @Test
     public void getsUserFromRepository() {
         String username = "frank";
-        User user = new User(username);
+        String displayname = "Frank";
+        User user = new User(username, displayname);
         when(usersRepository.one(anyString())).thenReturn(user);
 
         User foundUser = usersService.findOne(username);
@@ -60,9 +61,10 @@ public class UsersServiceTests {
     @Test
     public void replacesUserInRepository() {
         String username = "frank";
-        User user = new User(username);
+        String displayname = "Frank";
+        User user = new User(username, displayname);
         // different return user to make sure we return from repository
-        User user2 = new User("bob");
+        User user2 = new User("bob", "Bob");
         when(usersRepository.replace(anyString(), eq(user))).thenReturn(user2);
 
         User changedUser = usersService.replace(username, user);

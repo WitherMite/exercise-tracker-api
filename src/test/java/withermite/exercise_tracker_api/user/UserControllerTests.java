@@ -32,7 +32,8 @@ public class UserControllerTests {
     @Test
     public void getsUserFromService() throws Exception {
         String username = "frank";
-        User user = new User(username);
+        String displayname = "Frank";
+        User user = new User(username, displayname);
 
         when(usersService.findOne(username)).thenReturn(user);
 
@@ -40,14 +41,14 @@ public class UserControllerTests {
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange().expectAll(
                         r -> r.expectStatus().isOk(),
-                        r -> r.expectBody().json("{\"username\":\"frank\"}"));
+                        r -> r.expectBody().json("{\"username\":\"frank\", \"displayname\":\"Frank\"}"));
     }
 
     @Test
     public void getsManyUsersFromService() throws Exception {
         User[] users = {
-                new User("frank"),
-                new User("bob")
+                new User("frank", "Frank"),
+                new User("bob", "Bob")
         };
 
         when(usersService.findMany()).thenReturn(users);
@@ -61,10 +62,10 @@ public class UserControllerTests {
 
     @Test
     public void postsUserToService() throws Exception {
-        String json = "{\"username\":\"frank\"}";
-        User user = new User("frank");
+        String json = "{\"username\":\"frank\", \"displayname\":\"Frank\"}";
+        User user = new User("frank", "Frank");
 
-        when(usersService.create(any(User.class))).thenReturn(new User("response"));
+        when(usersService.create(any(User.class))).thenReturn(new User("response", "Response"));
 
         // responds with body from service
         rest.post().uri("/users")
@@ -72,19 +73,20 @@ public class UserControllerTests {
                 .body(json)
                 .exchange().expectAll(
                         r -> r.expectStatus().isCreated(),
-                        r -> r.expectBody().json("{\"username\":\"response\"}"));
+                        r -> r.expectBody().json("{\"username\":\"response\", \"displayname\":\"Response\"}"));
 
         // service recieves user shaped like request json
         verify(usersService).create(argument.capture());
         assertEquals(user.username, argument.getValue().username);
+        assertEquals(user.displayname, argument.getValue().displayname);
     }
 
     @Test
-    public void putsUserToService() {
-        String json = "{\"username\":\"frank\"}";
-        User user = new User("frank");
+    public void putsUserToService() throws Exception {
+        String json = "{\"username\":\"frank\", \"displayname\":\"Frank\"}";
+        User user = new User("frank", "Frank");
 
-        when(usersService.replace(eq("frank"), any(User.class))).thenReturn(new User("response"));
+        when(usersService.replace(eq("frank"), any(User.class))).thenReturn(new User("response", "Response"));
 
         // responds with body from service
         rest.put().uri("/users/frank")
@@ -92,15 +94,16 @@ public class UserControllerTests {
                 .body(json)
                 .exchange().expectAll(
                         r -> r.expectStatus().isOk(),
-                        r -> r.expectBody().json("{\"username\":\"response\"}"));
+                        r -> r.expectBody().json("{\"username\":\"response\", \"displayname\":\"Response\"}"));
 
         // service recieves user shaped like request json
         verify(usersService).replace(anyString(), argument.capture());
         assertEquals(user.username, argument.getValue().username);
+        assertEquals(user.displayname, argument.getValue().displayname);
     }
 
     @Test
-    public void deletesUserThroughService() {
+    public void deletesUserThroughService() throws Exception {
         String username = "frank";
 
         rest.delete().uri("/users/{username}", username)
@@ -114,12 +117,11 @@ public class UserControllerTests {
     // Edge cases
 
     @Test
-    public void putCreatesNewUserWhenServiceCantReplace() {
+    public void putCreatesNewUserWhenServiceCantReplace() throws Exception {
+        String json = "{\"username\":\"frank\", \"displayname\":\"Frank\"}";
+        User user = new User("frank", "Frank");
 
-        String json = "{\"username\":\"frank\"}";
-        User user = new User("frank");
-
-        when(usersService.create(any(User.class))).thenReturn(new User("response"));
+        when(usersService.create(any(User.class))).thenReturn(new User("response", "Response"));
 
         // responds with body from service create method, and created status
         rest.put().uri("/users/frank")
@@ -127,12 +129,13 @@ public class UserControllerTests {
                 .body(json)
                 .exchange().expectAll(
                         r -> r.expectStatus().isCreated(),
-                        r -> r.expectBody().json("{\"username\":\"response\"}"));
+                        r -> r.expectBody().json("{\"username\":\"response\", \"displayname\":\"Response\"}"));
 
         // service recieves attempt to replace, but is no mock so fails
         verify(usersService, times(1)).replace(eq("frank"), any(User.class));
         // and user shaped like request json to create
         verify(usersService).create(argument.capture());
         assertEquals(user.username, argument.getValue().username);
+        assertEquals(user.displayname, argument.getValue().displayname);
     }
 }
