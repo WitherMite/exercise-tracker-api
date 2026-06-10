@@ -53,9 +53,11 @@ jooq {
             database {
                 name = "org.jooq.meta.postgres.PostgresDatabase"
                 includes = ".*"
+                inputSchema = "public"
             }
             // Generation flags: See advanced configuration properties
             generate {
+                daos = true
                 springAnnotations = true
                 springDao = true
                 jooqVersionReference = false
