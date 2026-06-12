@@ -1,18 +1,18 @@
 BEGIN;
 
-DROP TABLE IF EXISTS user, exercise_type, exercise, user_exercise, user_exercise_statistic;
+DROP TABLE IF EXISTS app_user, exercise_type, exercise, user_exercise, user_exercise_statistic;
 DROP TYPE IF EXISTS user_role_enum, count_type_enum, work_time_type_enum, load_type_enum, rest_type_enum, subjective_effort_type_enum;
 
 CREATE TYPE user_role_enum AS ENUM ('default', 'admin');
 
 CREATE TABLE app_user (
-    id                  int            GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    username            varchar(30)    CONSTRAINT user_natural_key UNIQUE NOT NULL,
-    displayname         varchar(30)    NOT NULL,
-    pw_hash             text           NOT NULL,
-    user_role           user_role_enum DEFAULT 'default' NOT NULL,
-    weight              real,
-    are_workouts_public boolean        DEFAULT false NOT NULL
+    id                  int               GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    username            varchar(30)       CONSTRAINT user_natural_key UNIQUE NOT NULL,
+    displayname         varchar(30)       NOT NULL,
+    pw_hash             text              NOT NULL,
+    user_role           user_role_enum    DEFAULT 'default' NOT NULL,
+    weight              double precision,
+    are_workouts_public boolean           DEFAULT false NOT NULL
 );
 
 CREATE TYPE count_type_enum AS ENUM ('single', 'lap', 'set');
@@ -50,11 +50,11 @@ CREATE TYPE subjective_effort_type_enum AS ENUM ('CR-10', 'Borg');
 CREATE TABLE user_exercise_statistic (
     user_exercise_id        int                         REFERENCES user_exercise ON DELETE CASCADE NOT NULL,
     index                   smallint                    NOT NULL,
-    work_time               real,
-    load                    real,
+    work_time               double precision,
+    load                    double precision,
     rest_length             interval,
     subjective_effort_type  subjective_effort_type_enum DEFAULT 'CR-10' NOT NULL,
-    subjective_effort_value real,
+    subjective_effort_value double precision,
     PRIMARY KEY (user_exercise_id, index)
 );
 

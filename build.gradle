@@ -57,12 +57,12 @@ jooq {
             }
             // Generation flags: See advanced configuration properties
             generate {
-                daos = true
-                springAnnotations = true
-                springDao = true
                 jooqVersionReference = false
             }
-            target {}
+            target {
+                packageName = "org.jooq.generated"
+                directory = "/src/main/java"
+            }
         }
     }
 }
