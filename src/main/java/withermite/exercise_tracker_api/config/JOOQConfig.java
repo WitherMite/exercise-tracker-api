@@ -12,7 +12,7 @@ public class JOOQConfig {
     public DefaultConfigurationCustomizer customizeConfig() {
         return (DefaultConfiguration config) -> {
             config.settings().withReturnDefaultOnUpdatableRecord(true);
-            config.set(new AppRecordMapperProvider());
+            config.set(new AppRecordMapperProvider(config));
             config.set(new AppRecordUnmapperProvider(config));
         };
     }

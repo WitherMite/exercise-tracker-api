@@ -27,7 +27,6 @@ public class AppRecordUnmapperProvider implements RecordUnmapperProvider {
             if (unmapper instanceof RecordUnmapper) {
                 return (RecordUnmapper<E, R>) unmapper;
             }
-
         }
         return new DefaultRecordUnmapper<>(type, recordType, config);
     }

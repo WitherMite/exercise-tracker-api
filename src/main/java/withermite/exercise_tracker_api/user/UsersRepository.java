@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class UsersRepository {
-
     private final DSLContext create;
 
     public UsersRepository(DSLContext dslContext) {
