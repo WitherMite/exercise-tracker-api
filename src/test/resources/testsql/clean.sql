@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS app_user, exercise_type, exercise, user_exercise, user_exercise_statistic;
+DROP TYPE IF EXISTS user_role_enum, count_type_enum, work_time_type_enum, load_type_enum, rest_type_enum, subjective_effort_type_enum;

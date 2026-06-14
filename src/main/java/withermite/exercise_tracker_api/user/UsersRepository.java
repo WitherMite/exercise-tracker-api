@@ -22,8 +22,14 @@ public class UsersRepository {
     }
 
     public User one(String username) {
-        // get from db
-        return new User(username, "displayname");
+        AppUserRecord userRecord = create
+                .selectFrom(APP_USER)
+                .where(APP_USER.USERNAME.eq(username))
+                .fetchOne();
+        if (userRecord != null) {
+            return userRecord.into(User.class);
+        }
+        return null;
     }
 
     public User[] many() {

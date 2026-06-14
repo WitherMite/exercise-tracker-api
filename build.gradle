@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
 	implementation 'org.springframework.boot:spring-boot-starter-hateoas'
 	implementation 'org.springframework.boot:spring-boot-starter-jooq'
 	// implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -61,7 +62,7 @@ jooq {
             }
             target {
                 packageName = "org.jooq.generated"
-                directory = "/src/main/java"
+                directory = "./src/main/java"
             }
         }
     }

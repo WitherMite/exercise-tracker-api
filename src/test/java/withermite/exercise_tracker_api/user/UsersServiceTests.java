@@ -83,7 +83,17 @@ public class UsersServiceTests {
 
     @Test
     public void updatesUserInRepository() {
+        String username = "frank";
+        String displayname = "Frank";
+        User user = new User(username, displayname);
+        // different return user to make sure we return from repository
+        User user2 = new User("bob", "Bob");
+        when(usersRepository.replace(anyString(), eq(user))).thenReturn(user2);
 
+        User changedUser = usersService.replace(username, user);
+
+        assertInstanceOf(User.class, changedUser);
+        assertEquals(user2, changedUser);
     }
 
     @Test
