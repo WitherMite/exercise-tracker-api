@@ -62,15 +62,15 @@ public class UserIntegrationTests {
     public void postsUserToService() {
         String json = """
                     {
-                        "username":"frank",
-                        "displayname":"Frank",
+                        "username":"bob",
+                        "displayname":"Bob",
                         "weight": 65.2
                     }
                 """;
         String expectedJson = """
                     {
-                        "username":"frank",
-                        "displayname":"Frank",
+                        "username":"bob",
+                        "displayname":"Bob",
                         "role": "default",
                         "weight": 65.2,
                         "areWorkoutsPublic": False
