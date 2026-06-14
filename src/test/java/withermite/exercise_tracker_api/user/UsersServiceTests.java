@@ -73,9 +73,9 @@ public class UsersServiceTests {
         User user = new User(username, displayname);
         // different return user to make sure we return from repository
         User user2 = new User("bob", "Bob");
-        when(usersRepository.replace(anyString(), eq(user))).thenReturn(user2);
+        when(usersRepository.update(anyString(), eq(user))).thenReturn(user2);
 
-        User changedUser = usersService.replace(username, user);
+        User changedUser = usersService.update(username, user);
 
         assertInstanceOf(User.class, changedUser);
         assertEquals(user2, changedUser);
@@ -88,9 +88,9 @@ public class UsersServiceTests {
         User user = new User(username, displayname);
         // different return user to make sure we return from repository
         User user2 = new User("bob", "Bob");
-        when(usersRepository.replace(anyString(), eq(user))).thenReturn(user2);
+        when(usersRepository.update(anyString(), eq(user))).thenReturn(user2);
 
-        User changedUser = usersService.replace(username, user);
+        User changedUser = usersService.update(username, user);
 
         assertInstanceOf(User.class, changedUser);
         assertEquals(user2, changedUser);

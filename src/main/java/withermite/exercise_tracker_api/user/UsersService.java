@@ -15,23 +15,15 @@ public class UsersService {
     }
 
     public User findOne(String username) {
-        User user = usersRepository.one(username);
-        return user;
+        return usersRepository.one(username);
     }
 
     public User[] findMany() {
-        User[] users = usersRepository.many();
-        return users;
-    }
-
-    public User replace(String username, User user) {
-        return usersRepository.replace(username, user);
+        return usersRepository.many();
     }
 
     public User update(String username, User user) {
-        // need to get jooq stuff implemented to do this,
-        // too much work to actually test updating without it
-        return user;
+        return usersRepository.update(username, user);
     }
 
     public void delete(String username) {

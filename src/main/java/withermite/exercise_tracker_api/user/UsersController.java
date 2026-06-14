@@ -40,13 +40,12 @@ class UsersController {
 
     @PutMapping("/{key}")
     public ResponseEntity<User> replace(@PathVariable String key, @RequestBody User user) {
-        User replaced = usersService.replace(key, user);
-
-        if (replaced == null) {
+        if (!key.equals(user.username)) {
             User created = usersService.create(user);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         }
 
+        User replaced = usersService.update(key, user);
         return ResponseEntity.ok(replaced);
     }
 

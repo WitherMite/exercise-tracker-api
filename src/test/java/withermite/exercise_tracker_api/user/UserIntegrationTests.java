@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.jdbc.Sql;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_CLASS;
+import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureRestTestClient
 @Transactional
-@Sql("/db/seed-schema.sql")
-@Sql("/testsql/user/one-user.sql")
+@Sql(scripts = "/db/seed-schema.sql", executionPhase = BEFORE_TEST_METHOD)
+@Sql(scripts = "/testsql/user/one-user.sql", executionPhase = BEFORE_TEST_METHOD)
 @Sql(scripts = "/testsql/clean.sql", executionPhase = AFTER_TEST_CLASS)
 public class UserIntegrationTests {
 
@@ -118,10 +119,10 @@ public class UserIntegrationTests {
     public void putsUserToDB() {
         String json = """
                     {
-                        "username":"bob",
-                        "displayname":"Bob",
+                        "username":"frank",
+                        "displayname":"Frank",
                         "role": "admin",
-                        "weight": 72.4,
+                        "weight": 65.2,
                         "areWorkoutsPublic": true
                     }
                 """;
@@ -138,12 +139,12 @@ public class UserIntegrationTests {
         int rowsAfter = countRowsInTable(jdbc, "app_user");
         assertEquals(rowsBefore, rowsAfter);
 
-        jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+        jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
                 .query((rs) -> {
-                    assertEquals("Bob", rs.getString("displayname"));
+                    assertEquals("Frank", rs.getString("displayname"));
                     assertEquals("admin", rs.getString("user_role"));
                     assertEquals(true, rs.getBoolean("are_workouts_public"));
-                    assertEquals(72.4d, rs.getDouble("weight"));
+                    assertEquals(65.2d, rs.getDouble("weight"));
                 });
     }
 
@@ -202,10 +203,10 @@ public class UserIntegrationTests {
     public void putCreatesNewUserWhenDBCantReplace() {
         String json = """
                     {
-                        "username":"frank",
-                        "displayname":"Frank",
+                        "username":"bob",
+                        "displayname":"Bob",
                         "role": "admin",
-                        "weight": 65.2,
+                        "weight": 72.4,
                         "areWorkoutsPublic": true
                     }
                 """;
@@ -222,12 +223,12 @@ public class UserIntegrationTests {
         int rowsAfter = countRowsInTable(jdbc, "app_user");
         assertEquals(1, rowsAfter - rowsBefore);
 
-        jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+        jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
                 .query((rs) -> {
-                    assertEquals("frank69", rs.getString("displayname"));
+                    assertEquals("Bob", rs.getString("displayname"));
                     assertEquals("admin", rs.getString("user_role"));
                     assertEquals(true, rs.getBoolean("are_workouts_public"));
-                    assertEquals(65.2d, rs.getDouble("weight"));
+                    assertEquals(72.4d, rs.getDouble("weight"));
                 });
     }
 }

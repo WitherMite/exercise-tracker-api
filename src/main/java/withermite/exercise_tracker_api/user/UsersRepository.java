@@ -5,6 +5,8 @@ import static org.jooq.generated.tables.AppUser.APP_USER;
 import org.jooq.generated.tables.records.AppUserRecord;
 import org.springframework.stereotype.Repository;
 
+import static withermite.exercise_tracker_api.user.UserUnmapper.unmapDiff;
+
 @Repository
 public class UsersRepository {
     private final DSLContext create;
@@ -23,9 +25,7 @@ public class UsersRepository {
 
     public User one(String username) {
         AppUserRecord userRecord = create
-                .selectFrom(APP_USER)
-                .where(APP_USER.USERNAME.eq(username))
-                .fetchOne();
+                .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
         if (userRecord != null) {
             return userRecord.into(User.class);
         }
@@ -41,17 +41,23 @@ public class UsersRepository {
         return users;
     }
 
-    public User replace(String username, User user) {
-        // replace all fields in db
-        return user;
-    }
-
     public User update(String username, User user) {
-        // update non null fields in db, return new complete user
-        return user;
+        AppUserRecord userRecord = create
+                .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
+
+        unmapDiff(user, userRecord);
+        if (userRecord != null) {
+            userRecord.store();
+            return userRecord.into(User.class);
+        }
+        return null;
     }
 
     public void delete(String username) {
-        // remove from db
+        AppUserRecord userRecord = create
+                .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
+        if (userRecord != null) {
+            userRecord.delete();
+        }
     }
 }
