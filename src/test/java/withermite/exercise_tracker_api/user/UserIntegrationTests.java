@@ -1,13 +1,16 @@
 package withermite.exercise_tracker_api.user;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.jdbc.Sql;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_CLASS;
+import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,9 +25,12 @@ public class UserIntegrationTests {
     @Autowired
     private RestTestClient rest;
 
+    @Autowired
+    private JdbcClient jdbc;
+
     // Crud requests
     @Test
-    public void getsUserFromService() {
+    public void getsUserFromDB() {
         String username = "frank";
 
         String expectedJson = """
@@ -33,33 +39,43 @@ public class UserIntegrationTests {
                         "displayname":"Frank",
                         "role": "admin",
                         "weight": 65.2,
-                        "areWorkoutsPublic": True
+                        "areWorkoutsPublic": true
                     }
                 """;
+
+        int rowsBefore = countRowsInTable(jdbc, "app_user");
 
         rest.get().uri("/users/{username}", username)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange().expectAll(
                         r -> r.expectStatus().isOk(),
                         r -> r.expectBody().json(expectedJson));
+
+        int rowsAfter = countRowsInTable(jdbc, "app_user");
+        assertEquals(rowsBefore, rowsAfter);
     }
 
     @Disabled("not ready for testing pagination")
     @Test
-    public void getsManyUsersFromService() {
+    public void getsManyUsersFromDB() {
         String expectedJson = """
                     todo
                 """;
+
+        int rowsBefore = countRowsInTable(jdbc, "app_user");
 
         rest.get().uri("/users")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange().expectAll(
                         r -> r.expectStatus().isOk(),
                         r -> r.expectBody().json(expectedJson));
+
+        int rowsAfter = countRowsInTable(jdbc, "app_user");
+        assertEquals(rowsBefore, rowsAfter);
     }
 
     @Test
-    public void postsUserToService() {
+    public void postsUserToDB() {
         String json = """
                     {
                         "username":"bob",
@@ -73,9 +89,11 @@ public class UserIntegrationTests {
                         "displayname":"Bob",
                         "role": "default",
                         "weight": 65.2,
-                        "areWorkoutsPublic": False
+                        "areWorkoutsPublic": false
                     }
                 """;
+
+        int rowsBefore = countRowsInTable(jdbc, "app_user");
 
         rest.post().uri("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,19 +102,31 @@ public class UserIntegrationTests {
                         r -> r.expectStatus().isCreated(),
                         r -> r.expectBody().json(expectedJson));
 
+        int rowsAfter = countRowsInTable(jdbc, "app_user");
+        assertEquals(1, rowsAfter - rowsBefore);
+
+        jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+                .query((rs) -> {
+                    assertEquals("Bob", rs.getString("displayname"));
+                    assertEquals("default", rs.getString("user_role"));
+                    assertEquals(false, rs.getBoolean("are_workouts_public"));
+                    assertEquals(65.2d, rs.getDouble("weight"));
+                });
     }
 
     @Test
-    public void putsUserToService() {
+    public void putsUserToDB() {
         String json = """
                     {
                         "username":"bob",
                         "displayname":"Bob",
                         "role": "admin",
                         "weight": 72.4,
-                        "areWorkoutsPublic": True
+                        "areWorkoutsPublic": true
                     }
                 """;
+
+        int rowsBefore = countRowsInTable(jdbc, "app_user");
 
         rest.put().uri("/users/frank")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -105,10 +135,20 @@ public class UserIntegrationTests {
                         r -> r.expectStatus().isOk(),
                         r -> r.expectBody().json(json));
 
+        int rowsAfter = countRowsInTable(jdbc, "app_user");
+        assertEquals(rowsBefore, rowsAfter);
+
+        jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+                .query((rs) -> {
+                    assertEquals("Bob", rs.getString("displayname"));
+                    assertEquals("admin", rs.getString("user_role"));
+                    assertEquals(true, rs.getBoolean("are_workouts_public"));
+                    assertEquals(72.4d, rs.getDouble("weight"));
+                });
     }
 
     @Test
-    public void patchesUserThroughService() {
+    public void patchesUserInDB() {
         String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";
         String expectedJson = """
                     {
@@ -116,9 +156,11 @@ public class UserIntegrationTests {
                         "displayname":"frank69",
                         "role": "admin",
                         "weight": 65.33,
-                        "areWorkoutsPublic": True
+                        "areWorkoutsPublic": true
                     }
                 """;
+
+        int rowsBefore = countRowsInTable(jdbc, "app_user");
 
         rest.patch().uri("/users/frank")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -127,32 +169,48 @@ public class UserIntegrationTests {
                         r -> r.expectStatus().isOk(),
                         r -> r.expectBody().json(expectedJson));
 
+        int rowsAfter = countRowsInTable(jdbc, "app_user");
+        assertEquals(rowsBefore, rowsAfter);
+
+        jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+                .query((rs) -> {
+                    assertEquals("frank69", rs.getString("displayname"));
+                    assertEquals("admin", rs.getString("user_role"));
+                    assertEquals(true, rs.getBoolean("are_workouts_public"));
+                    assertEquals(65.33d, rs.getDouble("weight"));
+                });
     }
 
     @Test
-    public void deletesUserThroughService() {
+    public void deletesUserInDB() {
         String username = "frank";
+
+        int rowsBefore = countRowsInTable(jdbc, "app_user");
 
         rest.delete().uri("/users/{username}", username)
                 .exchange()
                 .expectStatus().isNoContent()
                 .expectBody().isEmpty();
 
+        int rowsAfter = countRowsInTable(jdbc, "app_user");
+        assertEquals(rowsBefore - 1, rowsAfter);
     }
 
     // Edge cases
 
     @Test
-    public void putCreatesNewUserWhenServiceCantReplace() {
+    public void putCreatesNewUserWhenDBCantReplace() {
         String json = """
                     {
                         "username":"frank",
                         "displayname":"Frank",
                         "role": "admin",
                         "weight": 65.2,
-                        "areWorkoutsPublic": True
+                        "areWorkoutsPublic": true
                     }
                 """;
+
+        int rowsBefore = countRowsInTable(jdbc, "app_user");
 
         rest.put().uri("/users/frank")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -160,5 +218,16 @@ public class UserIntegrationTests {
                 .exchange().expectAll(
                         r -> r.expectStatus().isCreated(),
                         r -> r.expectBody().json(json));
+
+        int rowsAfter = countRowsInTable(jdbc, "app_user");
+        assertEquals(1, rowsAfter - rowsBefore);
+
+        jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+                .query((rs) -> {
+                    assertEquals("frank69", rs.getString("displayname"));
+                    assertEquals("admin", rs.getString("user_role"));
+                    assertEquals(true, rs.getBoolean("are_workouts_public"));
+                    assertEquals(65.2d, rs.getDouble("weight"));
+                });
     }
 }
