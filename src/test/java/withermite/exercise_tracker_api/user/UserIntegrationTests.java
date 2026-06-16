@@ -2,6 +2,7 @@ package withermite.exercise_tracker_api.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
@@ -10,16 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.jdbc.Sql;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_CLASS;
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 import org.springframework.test.web.servlet.client.RestTestClient;
-import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @AutoConfigureRestTestClient
-@Transactional
-@Sql(scripts = "/db/seed-schema.sql", executionPhase = BEFORE_TEST_METHOD)
-@Sql(scripts = "/testsql/user/one-user.sql", executionPhase = BEFORE_TEST_METHOD)
+@Sql("/db/seed-schema.sql")
+@Sql("/testsql/user/populate-app-user.sql")
 @Sql(scripts = "/testsql/clean.sql", executionPhase = AFTER_TEST_CLASS)
 public class UserIntegrationTests {
 
@@ -29,206 +27,254 @@ public class UserIntegrationTests {
     @Autowired
     private JdbcClient jdbc;
 
-    // Crud requests
-    @Test
-    public void getsUserFromDB() {
-        String username = "frank";
+    @Nested
+    public class GetTests {
+        @Test
+        public void getsUserFromDB() {
+            String username = "frank";
 
-        String expectedJson = """
-                    {
-                        "username":"frank",
-                        "displayname":"Frank",
-                        "role": "admin",
-                        "weight": 65.2,
-                        "areWorkoutsPublic": true
-                    }
-                """;
+            String expectedJson = """
+                        {
+                            "username":"frank",
+                            "displayname":"Frank",
+                            "role": "admin",
+                            "weight": 65.2,
+                            "areWorkoutsPublic": true
+                        }
+                    """;
 
-        int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
 
-        rest.get().uri("/users/{username}", username)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange().expectAll(
-                        r -> r.expectStatus().isOk(),
-                        r -> r.expectBody().json(expectedJson));
+            rest.get().uri("/users/{username}", username)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isOk(),
+                            r -> r.expectBody().json(expectedJson));
 
-        int rowsAfter = countRowsInTable(jdbc, "app_user");
-        assertEquals(rowsBefore, rowsAfter);
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+        }
+
+        @Disabled("not ready for testing pagination")
+        @Test
+        public void getsManyUsersFromDB() {
+            String expectedJson = """
+                        todo
+                    """;
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.get().uri("/users")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isOk(),
+                            r -> r.expectBody().json(expectedJson));
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+        }
+
+        // Error tests
+
+        @Test
+        public void notFoundIfUserRequestedNotInDB() {
+            String username = "bob";
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.get().uri("/users/{username}", username)
+                    .exchange()
+                    .expectStatus().isNotFound()
+                    .expectBody().isEmpty();
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+        }
     }
 
-    @Disabled("not ready for testing pagination")
-    @Test
-    public void getsManyUsersFromDB() {
-        String expectedJson = """
-                    todo
-                """;
+    @Nested
+    public class PostTests {
 
-        int rowsBefore = countRowsInTable(jdbc, "app_user");
+        @Test
+        public void postsUserToDB() {
+            String json = """
+                        {
+                            "username":"bob",
+                            "displayname":"Bob",
+                            "weight": 65.2
+                        }
+                    """;
+            String expectedJson = """
+                        {
+                            "username":"bob",
+                            "displayname":"Bob",
+                            "role": "default",
+                            "weight": 65.2,
+                            "areWorkoutsPublic": false
+                        }
+                    """;
 
-        rest.get().uri("/users")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange().expectAll(
-                        r -> r.expectStatus().isOk(),
-                        r -> r.expectBody().json(expectedJson));
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
 
-        int rowsAfter = countRowsInTable(jdbc, "app_user");
-        assertEquals(rowsBefore, rowsAfter);
+            rest.post().uri("/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isCreated(),
+                            r -> r.expectBody().json(expectedJson));
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(1, rowsAfter - rowsBefore);
+
+            jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+                    .query((rs) -> {
+                        assertEquals("Bob", rs.getString("displayname"));
+                        assertEquals("default", rs.getString("user_role"));
+                        assertEquals(false, rs.getBoolean("are_workouts_public"));
+                        assertEquals(65.2d, rs.getDouble("weight"));
+                    });
+        }
     }
 
-    @Test
-    public void postsUserToDB() {
-        String json = """
-                    {
-                        "username":"bob",
-                        "displayname":"Bob",
-                        "weight": 65.2
-                    }
-                """;
-        String expectedJson = """
-                    {
-                        "username":"bob",
-                        "displayname":"Bob",
-                        "role": "default",
-                        "weight": 65.2,
-                        "areWorkoutsPublic": false
-                    }
-                """;
+    @Nested
+    public class putTests {
+        // These tests are awful
+        // need to test for what PUT is meant to be better
+        @Test
+        public void putsUserToDB() {
+            String json = """
+                        {
+                            "username":"frank",
+                            "displayname":"Frank",
+                            "role": "admin",
+                            "weight": 65.2,
+                            "areWorkoutsPublic": true
+                        }
+                    """;
 
-        int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
 
-        rest.post().uri("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(json)
-                .exchange().expectAll(
-                        r -> r.expectStatus().isCreated(),
-                        r -> r.expectBody().json(expectedJson));
+            rest.put().uri("/users/frank")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isOk(),
+                            r -> r.expectBody().json(json));
 
-        int rowsAfter = countRowsInTable(jdbc, "app_user");
-        assertEquals(1, rowsAfter - rowsBefore);
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
 
-        jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
-                .query((rs) -> {
-                    assertEquals("Bob", rs.getString("displayname"));
-                    assertEquals("default", rs.getString("user_role"));
-                    assertEquals(false, rs.getBoolean("are_workouts_public"));
-                    assertEquals(65.2d, rs.getDouble("weight"));
-                });
+            jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+                    .query((rs) -> {
+                        assertEquals("Frank", rs.getString("displayname"));
+                        assertEquals("admin", rs.getString("user_role"));
+                        assertEquals(true, rs.getBoolean("are_workouts_public"));
+                        assertEquals(65.2d, rs.getDouble("weight"));
+                    });
+        }
+
+        @Test
+        public void putCreatesNewUserWhenDBCantReplace() {
+            String json = """
+                        {
+                            "username":"bob",
+                            "displayname":"Bob",
+                            "role": "admin",
+                            "weight": 72.4,
+                            "areWorkoutsPublic": true
+                        }
+                    """;
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.put().uri("/users/frank")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isCreated(),
+                            r -> r.expectBody().json(json));
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(1, rowsAfter - rowsBefore);
+
+            jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+                    .query((rs) -> {
+                        assertEquals("Bob", rs.getString("displayname"));
+                        assertEquals("admin", rs.getString("user_role"));
+                        assertEquals(true, rs.getBoolean("are_workouts_public"));
+                        assertEquals(72.4d, rs.getDouble("weight"));
+                    });
+        }
     }
 
-    @Test
-    public void putsUserToDB() {
-        String json = """
-                    {
-                        "username":"frank",
-                        "displayname":"Frank",
-                        "role": "admin",
-                        "weight": 65.2,
-                        "areWorkoutsPublic": true
-                    }
-                """;
+    @Nested
+    public class PatchTests {
+        @Test
+        public void patchesUserInDB() {
+            String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";
+            String expectedJson = """
+                        {
+                            "username":"frank",
+                            "displayname":"frank69",
+                            "role": "admin",
+                            "weight": 65.33,
+                            "areWorkoutsPublic": true
+                        }
+                    """;
 
-        int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
 
-        rest.put().uri("/users/frank")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(json)
-                .exchange().expectAll(
-                        r -> r.expectStatus().isOk(),
-                        r -> r.expectBody().json(json));
+            rest.patch().uri("/users/frank")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isOk(),
+                            r -> r.expectBody().json(expectedJson));
 
-        int rowsAfter = countRowsInTable(jdbc, "app_user");
-        assertEquals(rowsBefore, rowsAfter);
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
 
-        jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
-                .query((rs) -> {
-                    assertEquals("Frank", rs.getString("displayname"));
-                    assertEquals("admin", rs.getString("user_role"));
-                    assertEquals(true, rs.getBoolean("are_workouts_public"));
-                    assertEquals(65.2d, rs.getDouble("weight"));
-                });
+            jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+                    .query((rs) -> {
+                        assertEquals("frank69", rs.getString("displayname"));
+                        assertEquals("admin", rs.getString("user_role"));
+                        assertEquals(true, rs.getBoolean("are_workouts_public"));
+                        assertEquals(65.33d, rs.getDouble("weight"));
+                    });
+        }
     }
 
-    @Test
-    public void patchesUserInDB() {
-        String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";
-        String expectedJson = """
-                    {
-                        "username":"frank",
-                        "displayname":"frank69",
-                        "role": "admin",
-                        "weight": 65.33,
-                        "areWorkoutsPublic": true
-                    }
-                """;
+    @Nested
+    public class DeleteTests {
+        @Test
+        public void deletesUserInDB() {
+            String username = "frank";
 
-        int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
 
-        rest.patch().uri("/users/frank")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(json)
-                .exchange().expectAll(
-                        r -> r.expectStatus().isOk(),
-                        r -> r.expectBody().json(expectedJson));
+            rest.delete().uri("/users/{username}", username)
+                    .exchange()
+                    .expectStatus().isNoContent()
+                    .expectBody().isEmpty();
 
-        int rowsAfter = countRowsInTable(jdbc, "app_user");
-        assertEquals(rowsBefore, rowsAfter);
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore - 1, rowsAfter);
+        }
 
-        jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
-                .query((rs) -> {
-                    assertEquals("frank69", rs.getString("displayname"));
-                    assertEquals("admin", rs.getString("user_role"));
-                    assertEquals(true, rs.getBoolean("are_workouts_public"));
-                    assertEquals(65.33d, rs.getDouble("weight"));
-                });
-    }
+        // Error tests
+        @Test
+        public void notFoundIfUserNotInDB() {
+            String username = "bob";
 
-    @Test
-    public void deletesUserInDB() {
-        String username = "frank";
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
 
-        int rowsBefore = countRowsInTable(jdbc, "app_user");
+            rest.delete().uri("/users/{username}", username)
+                    .exchange()
+                    .expectStatus().isNotFound()
+                    .expectBody().isEmpty();
 
-        rest.delete().uri("/users/{username}", username)
-                .exchange()
-                .expectStatus().isNoContent()
-                .expectBody().isEmpty();
-
-        int rowsAfter = countRowsInTable(jdbc, "app_user");
-        assertEquals(rowsBefore - 1, rowsAfter);
-    }
-
-    // Edge cases
-
-    @Test
-    public void putCreatesNewUserWhenDBCantReplace() {
-        String json = """
-                    {
-                        "username":"bob",
-                        "displayname":"Bob",
-                        "role": "admin",
-                        "weight": 72.4,
-                        "areWorkoutsPublic": true
-                    }
-                """;
-
-        int rowsBefore = countRowsInTable(jdbc, "app_user");
-
-        rest.put().uri("/users/frank")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(json)
-                .exchange().expectAll(
-                        r -> r.expectStatus().isCreated(),
-                        r -> r.expectBody().json(json));
-
-        int rowsAfter = countRowsInTable(jdbc, "app_user");
-        assertEquals(1, rowsAfter - rowsBefore);
-
-        jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
-                .query((rs) -> {
-                    assertEquals("Bob", rs.getString("displayname"));
-                    assertEquals("admin", rs.getString("user_role"));
-                    assertEquals(true, rs.getBoolean("are_workouts_public"));
-                    assertEquals(72.4d, rs.getDouble("weight"));
-                });
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+        }
     }
 }

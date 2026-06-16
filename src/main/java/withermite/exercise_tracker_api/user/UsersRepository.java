@@ -53,11 +53,13 @@ public class UsersRepository {
         return null;
     }
 
-    public void delete(String username) {
+    public boolean delete(String username) {
         AppUserRecord userRecord = create
                 .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
         if (userRecord != null) {
             userRecord.delete();
+            return true;
         }
+        return false;
     }
 }

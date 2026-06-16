@@ -34,8 +34,12 @@ class UsersController {
     }
 
     @GetMapping("/{key}")
-    public User one(@PathVariable String key) {
-        return usersService.findOne(key);
+    public ResponseEntity<User> one(@PathVariable String key) {
+        User user = usersService.findOne(key);
+        if (user != null) {
+            return ResponseEntity.ok().body(user);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{key}")
@@ -55,8 +59,11 @@ class UsersController {
     }
 
     @DeleteMapping("/{key}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String key) {
-        usersService.delete(key);
+    public ResponseEntity<Void> delete(@PathVariable String key) {
+        boolean deleted = usersService.delete(key);
+        if (deleted) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 }

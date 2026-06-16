@@ -26,7 +26,7 @@ public class UsersService {
         return usersRepository.update(username, user);
     }
 
-    public void delete(String username) {
-        usersRepository.delete(username);
+    public boolean delete(String username) {
+        return usersRepository.delete(username);
     }
 }
