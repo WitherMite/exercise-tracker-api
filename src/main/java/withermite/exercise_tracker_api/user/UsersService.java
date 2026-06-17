@@ -11,6 +11,9 @@ public class UsersService {
     }
 
     public User create(User user) {
+        if (user.username == null || user.displayname == null) {
+            return null;
+        }
         return usersRepository.save(user);
     }
 
@@ -20,6 +23,13 @@ public class UsersService {
 
     public User[] findMany() {
         return usersRepository.many();
+    }
+
+    public User replace(String username, User user) {
+        if (user.username == null || user.displayname == null) {
+            return null;
+        }
+        return usersRepository.update(username, user);
     }
 
     public User update(String username, User user) {

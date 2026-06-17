@@ -1,8 +1,10 @@
 package withermite.exercise_tracker_api.user;
 
 import org.jooq.DSLContext;
+import org.jooq.exception.DataAccessException;
 import static org.jooq.generated.tables.AppUser.APP_USER;
 import org.jooq.generated.tables.records.AppUserRecord;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
 import static withermite.exercise_tracker_api.user.UserUnmapper.unmapDiff;
@@ -16,11 +18,17 @@ public class UsersRepository {
     }
 
     public User save(User user) {
-        AppUserRecord userRecord = create.newRecord(APP_USER, user);
-        // temporary until adding security features
-        userRecord.setPwHash("placeholder");
-        userRecord.store();
-        return userRecord.into(User.class);
+        try {
+            AppUserRecord userRecord = create.newRecord(APP_USER, user);
+            // temporary until adding security features
+            userRecord.setPwHash("placeholder");
+            userRecord.store();
+            return userRecord.into(User.class);
+        } catch (DataIntegrityViolationException e) {
+            System.err.println(e.toString());
+            System.err.println(e.getMessage());
+            return null;
+        }
     }
 
     public User one(String username) {
@@ -42,24 +50,30 @@ public class UsersRepository {
     }
 
     public User update(String username, User user) {
-        AppUserRecord userRecord = create
-                .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
+        try {
+            AppUserRecord userRecord = create
+                    .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
 
-        unmapDiff(user, userRecord);
-        if (userRecord != null) {
-            userRecord.store();
-            return userRecord.into(User.class);
+            unmapDiff(user, userRecord);
+            if (userRecord != null) {
+                userRecord.store();
+                return userRecord.into(User.class);
+            }
+            return null;
+
+        } catch (DataAccessException e) {
+            System.err.println(e.getMessage());
+            return null;
         }
-        return null;
     }
 
     public boolean delete(String username) {
         AppUserRecord userRecord = create
                 .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
-        if (userRecord != null) {
-            userRecord.delete();
-            return true;
+        if (userRecord == null) {
+            return false;
         }
-        return false;
+        userRecord.delete();
+        return true;
     }
 }

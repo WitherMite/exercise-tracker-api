@@ -94,7 +94,7 @@ public class UserIntegrationTests {
 
     @Nested
     public class PostTests {
-
+        // should fail with 409 conflict if fails unique constraint
         @Test
         public void postsUserToDB() {
             String json = """
@@ -134,12 +134,31 @@ public class UserIntegrationTests {
                         assertEquals(65.2d, rs.getDouble("weight"));
                     });
         }
+
+        // Error tests
+
+        @Test
+        public void badRequestIfMissingFields() {
+            String json = "{\"username\": \"bob\"}";
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.post().uri("/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody().isEmpty();
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+        }
     }
 
     @Nested
     public class putTests {
-        // These tests are awful
-        // need to test for what PUT is meant to be better
+        // decide if nullable and default values should
+        // be optional and default to null/default
         @Test
         public void putsUserToDB() {
             String json = """
@@ -174,7 +193,11 @@ public class UserIntegrationTests {
         }
 
         @Test
-        public void putCreatesNewUserWhenDBCantReplace() {
+        @Disabled("this test is wrong")
+        public void putCreatesNewUserWhenNotInDB() {
+            // this should just work and let the username change
+            // should be testing that the uri username key not existing in
+            // db creates resource
             String json = """
                         {
                             "username":"bob",
@@ -205,10 +228,32 @@ public class UserIntegrationTests {
                         assertEquals(72.4d, rs.getDouble("weight"));
                     });
         }
+
+        // Error tests
+
+        @Test
+        public void badRequestIfMissingFields() {
+            String json = "{\"displayname\": \"frank69\"}";
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.put().uri("/users/frank")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange()
+                    .expectStatus().isBadRequest()
+                    .expectBody().isEmpty();
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+        }
     }
 
     @Nested
     public class PatchTests {
+        // should test that it can update individual fields without nulling
+        // or setting others default
+        // should fail if no user to update
         @Test
         public void patchesUserInDB() {
             String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";

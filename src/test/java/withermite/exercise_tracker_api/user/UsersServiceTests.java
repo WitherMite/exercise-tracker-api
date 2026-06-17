@@ -5,10 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,7 +77,7 @@ public class UsersServiceTests {
         User user2 = new User("bob", "Bob");
         when(usersRepository.update(anyString(), eq(user))).thenReturn(user2);
 
-        User changedUser = usersService.update(username, user);
+        User changedUser = usersService.replace(username, user);
 
         assertInstanceOf(User.class, changedUser);
         assertEquals(user2, changedUser);
@@ -107,4 +109,25 @@ public class UsersServiceTests {
 
     // Edge cases
 
+    @Test
+    public void createShouldNotAllowIncompleteUsers() {
+        String username = "frank";
+        User user = new User(username, null);
+
+        User newUser = usersService.create(user);
+
+        verify(usersRepository, never()).save(any(User.class));
+        assertEquals(null, newUser);
+    }
+
+    @Test
+    public void replaceShouldNotAllowIncompleteUsers() {
+        String username = "frank";
+        User user = new User(username, null);
+
+        User changedUser = usersService.replace(username, user);
+
+        verify(usersRepository, never()).update(anyString(), any(User.class));
+        assertEquals(null, changedUser);
+    }
 }

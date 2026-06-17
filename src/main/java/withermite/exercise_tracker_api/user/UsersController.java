@@ -1,6 +1,7 @@
 package withermite.exercise_tracker_api.user;
 
-import org.springframework.http.HttpStatus;
+import java.net.URI;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/users")
@@ -28,29 +29,35 @@ class UsersController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public User create(@RequestBody User user) {
-        return usersService.create(user);
+    public ResponseEntity<User> create(@RequestBody User user) {
+        User created = usersService.create(user);
+
+        if (created == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{username}").buildAndExpand(user.username).toUri();
+        return ResponseEntity.created(location).body(created);
     }
 
     @GetMapping("/{key}")
     public ResponseEntity<User> one(@PathVariable String key) {
         User user = usersService.findOne(key);
-        if (user != null) {
-            return ResponseEntity.ok().body(user);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok().body(user);
     }
 
     @PutMapping("/{key}")
     public ResponseEntity<User> replace(@PathVariable String key, @RequestBody User user) {
-        if (!key.equals(user.username)) {
-            User created = usersService.create(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        User replaced = usersService.replace(key, user);
+        if (replaced == null) {
+            return ResponseEntity.badRequest().build();
         }
 
-        User replaced = usersService.update(key, user);
-        return ResponseEntity.ok(replaced);
+        return ResponseEntity.ok().body(replaced);
     }
 
     @PatchMapping("/{key}")
@@ -61,9 +68,9 @@ class UsersController {
     @DeleteMapping("/{key}")
     public ResponseEntity<Void> delete(@PathVariable String key) {
         boolean deleted = usersService.delete(key);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
+        if (!deleted) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 }
