@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import withermite.exercise_tracker_api.util.ResourceWrapper;
+
 @RestController
 @RequestMapping("/users")
 class UsersController {
@@ -52,12 +54,19 @@ class UsersController {
 
     @PutMapping("/{key}")
     public ResponseEntity<User> replace(@PathVariable String key, @RequestBody User user) {
-        User replaced = usersService.replace(key, user);
-        if (replaced == null) {
+        ResourceWrapper<User> replaced = usersService.replace(key, user);
+
+        if (replaced.resource == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok().body(replaced);
+        if (replaced.wasCreated) {
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{username}").buildAndExpand(user.username).toUri();
+            return ResponseEntity.created(location).body(replaced.resource);
+        }
+
+        return ResponseEntity.ok().body(replaced.resource);
     }
 
     @PatchMapping("/{key}")

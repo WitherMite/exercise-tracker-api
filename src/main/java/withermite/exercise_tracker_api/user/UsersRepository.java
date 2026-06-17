@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 
 import static withermite.exercise_tracker_api.user.UserUnmapper.unmapDiff;
+import withermite.exercise_tracker_api.util.ResourceWrapper;
 
 @Repository
 public class UsersRepository {
@@ -60,6 +61,28 @@ public class UsersRepository {
                 return userRecord.into(User.class);
             }
             return null;
+
+        } catch (DataAccessException e) {
+            System.err.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public ResourceWrapper<User> replace(String username, User user) {
+        try {
+            // try to get user from db
+            AppUserRecord userRecord = create
+                    .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
+
+            // if was in db, replace all values, and force a update query
+            if (userRecord != null) {
+                userRecord.from(user);
+                userRecord.touched(false);
+                userRecord.store();
+                return new ResourceWrapper<>(userRecord.into(User.class));
+            }
+            // if not in db create new user
+            return new ResourceWrapper<>(save(user), true);
 
         } catch (DataAccessException e) {
             System.err.println(e.getMessage());

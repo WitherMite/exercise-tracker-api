@@ -193,11 +193,7 @@ public class UserIntegrationTests {
         }
 
         @Test
-        @Disabled("this test is wrong")
         public void putCreatesNewUserWhenNotInDB() {
-            // this should just work and let the username change
-            // should be testing that the uri username key not existing in
-            // db creates resource
             String json = """
                         {
                             "username":"bob",
@@ -210,7 +206,7 @@ public class UserIntegrationTests {
 
             int rowsBefore = countRowsInTable(jdbc, "app_user");
 
-            rest.put().uri("/users/frank")
+            rest.put().uri("/users/bob")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(

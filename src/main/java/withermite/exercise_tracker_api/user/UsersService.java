@@ -2,6 +2,8 @@ package withermite.exercise_tracker_api.user;
 
 import org.springframework.stereotype.Service;
 
+import withermite.exercise_tracker_api.util.ResourceWrapper;
+
 @Service
 public class UsersService {
     private final UsersRepository usersRepository;
@@ -25,11 +27,11 @@ public class UsersService {
         return usersRepository.many();
     }
 
-    public User replace(String username, User user) {
+    public ResourceWrapper<User> replace(String username, User user) {
         if (user.username == null || user.displayname == null) {
-            return null;
+            return new ResourceWrapper<>(null);
         }
-        return usersRepository.update(username, user);
+        return usersRepository.replace(username, user);
     }
 
     public User update(String username, User user) {

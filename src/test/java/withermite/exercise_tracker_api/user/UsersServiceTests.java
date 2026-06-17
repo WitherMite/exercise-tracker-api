@@ -16,6 +16,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
+import withermite.exercise_tracker_api.util.ResourceWrapper;
+
 public class UsersServiceTests {
     private AutoCloseable mocks;
 
@@ -75,9 +77,9 @@ public class UsersServiceTests {
         User user = new User(username, displayname);
         // different return user to make sure we return from repository
         User user2 = new User("bob", "Bob");
-        when(usersRepository.update(anyString(), eq(user))).thenReturn(user2);
+        when(usersRepository.replace(anyString(), eq(user))).thenReturn(new ResourceWrapper<>(user2));
 
-        User changedUser = usersService.replace(username, user);
+        User changedUser = usersService.replace(username, user).resource;
 
         assertInstanceOf(User.class, changedUser);
         assertEquals(user2, changedUser);
@@ -125,9 +127,9 @@ public class UsersServiceTests {
         String username = "frank";
         User user = new User(username, null);
 
-        User changedUser = usersService.replace(username, user);
+        User changedUser = usersService.replace(username, user).resource;
 
-        verify(usersRepository, never()).update(anyString(), any(User.class));
+        verify(usersRepository, never()).replace(anyString(), any(User.class));
         assertEquals(null, changedUser);
     }
 }
