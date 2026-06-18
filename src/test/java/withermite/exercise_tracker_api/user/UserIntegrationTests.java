@@ -94,7 +94,6 @@ public class UserIntegrationTests {
 
     @Nested
     public class PostTests {
-        // should fail with 409 conflict if fails unique constraint
         @Test
         public void postsUserToDB() {
             String json = """
@@ -148,6 +147,31 @@ public class UserIntegrationTests {
                     .body(json)
                     .exchange()
                     .expectStatus().isBadRequest()
+                    .expectBody().isEmpty();
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+        }
+
+        @Test
+        public void conflictIfUsernameNotUnique() {
+            String json = """
+                        {
+                            "username":"frank",
+                            "displayname":"Frank",
+                            "role": "default",
+                            "weight": 70,
+                            "areWorkoutsPublic": true
+                        }
+                    """;
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.post().uri("/users")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange()
+                    .expectStatus().isEqualTo(409)
                     .expectBody().isEmpty();
 
             int rowsAfter = countRowsInTable(jdbc, "app_user");

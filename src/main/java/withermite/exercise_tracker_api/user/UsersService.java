@@ -1,5 +1,8 @@
 package withermite.exercise_tracker_api.user;
 
+import java.util.ArrayList;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import withermite.exercise_tracker_api.util.ResourceWrapper;
@@ -12,11 +15,22 @@ public class UsersService {
         this.usersRepository = userRepository;
     }
 
-    public User create(User user) {
+    public ResourceWrapper<User> create(User user) {
         if (user.username == null || user.displayname == null) {
             return null;
         }
-        return usersRepository.save(user);
+        try {
+            return new ResourceWrapper<>(usersRepository.save(user));
+        } catch (DataIntegrityViolationException e) {
+            String causeMsg = e.getCause().getMessage();
+            ArrayList<String> problems = new ArrayList<>();
+            System.err.println(e.toString());
+            System.err.println(causeMsg);
+            if (causeMsg.contains("duplicate key value violates unique constraint \"user_natural_key\"")) {
+                problems.add("username" + user.username + "already exists");
+            }
+            return new ResourceWrapper<>(null, problems);
+        }
     }
 
     public User findOne(String username) {

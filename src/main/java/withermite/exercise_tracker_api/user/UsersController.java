@@ -32,15 +32,19 @@ class UsersController {
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user) {
-        User created = usersService.create(user);
+        ResourceWrapper<User> created = usersService.create(user);
 
         if (created == null) {
             return ResponseEntity.badRequest().build();
         }
 
+        if (created.problems != null) {
+            return ResponseEntity.status(409).build();
+        }
+
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{username}").buildAndExpand(user.username).toUri();
-        return ResponseEntity.created(location).body(created);
+        return ResponseEntity.created(location).body(created.resource);
     }
 
     @GetMapping("/{key}")

@@ -116,10 +116,10 @@ public class UsersServiceTests {
         String username = "frank";
         User user = new User(username, null);
 
-        User newUser = usersService.create(user);
+        ResourceWrapper<User> result = usersService.create(user);
 
         verify(usersRepository, never()).save(any(User.class));
-        assertEquals(null, newUser);
+        assertEquals(null, result);
     }
 
     @Test
