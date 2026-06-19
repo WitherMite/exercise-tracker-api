@@ -27,7 +27,7 @@ public class UsersService {
             System.err.println(e.toString());
             System.err.println(causeMsg);
             if (causeMsg.contains("duplicate key value violates unique constraint \"user_natural_key\"")) {
-                problems.add("username" + user.username + "already exists");
+                problems.add("username " + user.username + " taken");
             }
             return new ResourceWrapper<>(null, problems);
         }

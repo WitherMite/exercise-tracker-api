@@ -26,8 +26,9 @@ public class UsersRepository {
     }
 
     public User one(String username) {
-        AppUserRecord userRecord = create
-                .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
+        AppUserRecord userRecord = create.fetchOne(
+                APP_USER, APP_USER.USERNAME.eq(username));
+
         if (userRecord != null) {
             return userRecord.into(User.class);
         }
@@ -45,8 +46,8 @@ public class UsersRepository {
 
     public User update(String username, User user) {
         try {
-            AppUserRecord userRecord = create
-                    .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
+            AppUserRecord userRecord = create.fetchOne(
+                    APP_USER, APP_USER.USERNAME.eq(username));
 
             unmapDiff(user, userRecord);
             if (userRecord != null) {
@@ -64,8 +65,8 @@ public class UsersRepository {
     public ResourceWrapper<User> replace(String username, User user) {
         try {
             // try to get user from db
-            AppUserRecord userRecord = create
-                    .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
+            AppUserRecord userRecord = create.fetchOne(
+                    APP_USER, APP_USER.USERNAME.eq(username));
 
             // if was in db, replace all values, and update
             if (userRecord != null) {
@@ -83,8 +84,9 @@ public class UsersRepository {
     }
 
     public boolean delete(String username) {
-        AppUserRecord userRecord = create
-                .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
+        AppUserRecord userRecord = create.fetchOne(
+                APP_USER, APP_USER.USERNAME.eq(username));
+
         if (userRecord == null) {
             return false;
         }

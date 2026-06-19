@@ -44,15 +44,18 @@ class UsersController {
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{username}").buildAndExpand(user.username).toUri();
+
         return ResponseEntity.created(location).body(created.resource);
     }
 
     @GetMapping("/{key}")
     public ResponseEntity<User> one(@PathVariable String key) {
         User user = usersService.findOne(key);
+
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
+
         return ResponseEntity.ok().body(user);
     }
 
@@ -100,6 +103,7 @@ class UsersController {
     @DeleteMapping("/{key}")
     public ResponseEntity<Void> delete(@PathVariable String key) {
         boolean deleted = usersService.delete(key);
+
         if (!deleted) {
             return ResponseEntity.notFound().build();
         }
