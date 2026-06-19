@@ -33,8 +33,16 @@ public class UserUnmapper implements RecordUnmapper<User, AppUserRecord> {
             record.setUsername(user.username);
             record.setDisplayname(user.displayname);
             record.setWeight(user.weight);
-            record.setUserRole(UserRoleEnum.lookupLiteral(user.role));
-            record.setAreWorkoutsPublic(user.areWorkoutsPublic);
+            if (user.role == null) {
+                record.setUserRole(UserRoleEnum.default_);
+            } else {
+                record.setUserRole(UserRoleEnum.lookupLiteral(user.role));
+            }
+            if (user.areWorkoutsPublic == null) {
+                record.setAreWorkoutsPublic(false);
+            } else {
+                record.setAreWorkoutsPublic(user.areWorkoutsPublic);
+            }
             return record;
         } catch (Exception e) {
             System.err.println(e.toString());

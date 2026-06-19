@@ -59,23 +59,42 @@ class UsersController {
     @PutMapping("/{key}")
     public ResponseEntity<User> replace(@PathVariable String key, @RequestBody User user) {
         ResourceWrapper<User> replaced = usersService.replace(key, user);
+        User replacedUser = replaced.resource;
 
-        if (replaced.resource == null) {
+        if (replacedUser == null) {
             return ResponseEntity.badRequest().build();
         }
 
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/users/{username}").buildAndExpand(replacedUser.username).toUri();
+
         if (replaced.wasCreated) {
-            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{username}").buildAndExpand(user.username).toUri();
-            return ResponseEntity.created(location).body(replaced.resource);
+            return ResponseEntity.created(location).body(replacedUser);
         }
 
-        return ResponseEntity.ok().body(replaced.resource);
+        if (!key.equals(replacedUser.username)) {
+            return ResponseEntity.status(303)
+                    .header("Location", location.toString())
+                    .body(replacedUser);
+        }
+
+        return ResponseEntity.ok().body(replacedUser);
     }
 
     @PatchMapping("/{key}")
-    public User update(@PathVariable String key, @RequestBody User user) {
-        return usersService.update(key, user);
+    public ResponseEntity<User> update(@PathVariable String key, @RequestBody User user) {
+        User newUser = usersService.update(key, user);
+
+        if (!key.equals(newUser.username)) {
+            URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/users/{username}").buildAndExpand(newUser.username).toUri();
+
+            return ResponseEntity.status(303)
+                    .header("Location", location.toString())
+                    .body(newUser);
+        }
+
+        return ResponseEntity.ok().body(newUser);
     }
 
     @DeleteMapping("/{key}")

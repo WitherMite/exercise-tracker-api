@@ -50,7 +50,7 @@ public class UsersRepository {
 
             unmapDiff(user, userRecord);
             if (userRecord != null) {
-                userRecord.store();
+                userRecord.update();
                 return userRecord.into(User.class);
             }
             return null;
@@ -67,11 +67,10 @@ public class UsersRepository {
             AppUserRecord userRecord = create
                     .fetchOne(APP_USER, APP_USER.USERNAME.eq(username));
 
-            // if was in db, replace all values, and force a update query
+            // if was in db, replace all values, and update
             if (userRecord != null) {
                 userRecord.from(user);
-                userRecord.touched(false);
-                userRecord.store();
+                userRecord.update();
                 return new ResourceWrapper<>(userRecord.into(User.class));
             }
             // if not in db create new user
