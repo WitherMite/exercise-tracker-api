@@ -1,7 +1,10 @@
 package withermite.exercise_tracker_api.user;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -19,15 +23,30 @@ import withermite.exercise_tracker_api.util.ResourceWrapper;
 @RestController
 @RequestMapping("/users")
 class UsersController {
+    private final int defaultPageSize;
     private final UsersService usersService;
 
-    public UsersController(UsersService usersService) {
+    public UsersController(UsersService usersService, @Value("${user.defaultPageSize}") int defaultPageSize) {
         this.usersService = usersService;
+        this.defaultPageSize = defaultPageSize;
     }
 
     @GetMapping
-    public User[] many() {
-        return usersService.findMany();
+    public ResponseEntity<List<User>> many(@RequestParam Map<String, String> params) {
+        try {
+            int limit = params.containsKey("limit")
+                    ? Integer.parseInt(params.get("limit"))
+                    : defaultPageSize;
+            int offset = params.containsKey("offset")
+                    ? Integer.parseInt(params.get("offset"))
+                    : 0;
+
+            List<User> users = usersService.findMany(limit, offset);
+            return ResponseEntity.ok().body(users);
+
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping
@@ -87,6 +106,10 @@ class UsersController {
     @PatchMapping("/{key}")
     public ResponseEntity<User> update(@PathVariable String key, @RequestBody User user) {
         User newUser = usersService.update(key, user);
+
+        if (newUser == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         if (!key.equals(newUser.username)) {
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()

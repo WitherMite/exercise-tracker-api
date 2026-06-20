@@ -65,9 +65,9 @@ public class UsersServiceTests {
     @Test
     public void getsManyUsersFromRepository() {
 
-        usersService.findMany();
+        usersService.findMany(5, 0);
 
-        verify(usersRepository, times(1)).many();
+        verify(usersRepository, times(1)).many(5, 0);
     }
 
     @Test

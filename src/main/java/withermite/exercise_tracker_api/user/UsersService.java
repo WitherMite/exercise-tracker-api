@@ -1,6 +1,7 @@
 package withermite.exercise_tracker_api.user;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -37,8 +38,8 @@ public class UsersService {
         return usersRepository.one(username);
     }
 
-    public User[] findMany() {
-        return usersRepository.many();
+    public List<User> findMany(int pageSize, int offset) {
+        return usersRepository.many(pageSize, offset);
     }
 
     public ResourceWrapper<User> replace(String username, User user) {

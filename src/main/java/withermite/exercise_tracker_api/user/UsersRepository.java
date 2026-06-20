@@ -1,5 +1,7 @@
 package withermite.exercise_tracker_api.user;
 
+import java.util.List;
+
 import org.jooq.DSLContext;
 import org.jooq.exception.DataAccessException;
 import static org.jooq.generated.tables.AppUser.APP_USER;
@@ -35,12 +37,8 @@ public class UsersRepository {
         return null;
     }
 
-    public User[] many() {
-        // get from db
-        User[] users = {
-                new User("1", "one"),
-                new User("2", "two"),
-                new User("3", "three"), };
+    public List<User> many(int pageSize, int offset) {
+        List<User> users = create.selectFrom(APP_USER).limit(pageSize).offset(offset).fetchInto(User.class);
         return users;
     }
 
@@ -49,8 +47,8 @@ public class UsersRepository {
             AppUserRecord userRecord = create.fetchOne(
                     APP_USER, APP_USER.USERNAME.eq(username));
 
-            unmapDiff(user, userRecord);
             if (userRecord != null) {
+                unmapDiff(user, userRecord);
                 userRecord.update();
                 return userRecord.into(User.class);
             }

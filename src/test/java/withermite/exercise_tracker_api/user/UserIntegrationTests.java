@@ -3,7 +3,6 @@ package withermite.exercise_tracker_api.user;
 import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,16 +57,87 @@ public class UserIntegrationTests {
             assertEquals(rowsBefore, rowsAfter);
         }
 
-        @Disabled("not ready for testing pagination")
         @Test
         public void getsManyUsersFromDB() {
+            // defaulting to a page size limit of 5 for now
+            // extract expected json into resource file in refactor
+            // to prevent thing like this
             String expectedJson = """
-                        todo
+                        [
+                            {
+                                "username":"frank",
+                                "displayname":"Frank",
+                                "role": "admin",
+                                "weight": 65.2,
+                                "areWorkoutsPublic": true
+                            },
+                            {
+                                "username":"frank2",
+                                "displayname":"Frank",
+                                "role": "admin",
+                                "weight": 65.2,
+                                "areWorkoutsPublic": true
+                            },
+                            {
+                                "username":"frank3",
+                                "displayname":"Frank",
+                                "role": "admin",
+                                "weight": 65.2,
+                                "areWorkoutsPublic": true
+                            },
+                            {
+                                "username":"frank4",
+                                "displayname":"Frank",
+                                "role": "admin",
+                                "weight": 65.2,
+                                "areWorkoutsPublic": true
+                            },
+                            {
+                                "username":"frank5",
+                                "displayname":"Frank",
+                                "role": "admin",
+                                "weight": 65.2,
+                                "areWorkoutsPublic": true
+                            }
+                        ]
                     """;
 
             int rowsBefore = countRowsInTable(jdbc, "app_user");
 
             rest.get().uri("/users")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isOk(),
+                            r -> r.expectBody().json(expectedJson));
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+        }
+
+        @Test
+        public void getsSpecifiedCountAndOffsetOfUsersFromDB() {
+            String expectedJson = """
+                        [
+                            {
+                                "username":"frank3",
+                                "displayname":"Frank",
+                                "role": "admin",
+                                "weight": 65.2,
+                                "areWorkoutsPublic": true
+                            },
+                            {
+                                "username":"frank4",
+                                "displayname":"Frank",
+                                "role": "admin",
+                                "weight": 65.2,
+                                "areWorkoutsPublic": true
+                            }
+                        ]
+                    """;
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.get().uri("/users?limit=2&offset=2")
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
@@ -348,9 +418,6 @@ public class UserIntegrationTests {
 
     @Nested
     public class PatchTests {
-        // should test that it can update individual fields without nulling
-        // or setting others default
-        // should fail if no user to update
         @Test
         public void patchesUserInDB() {
             String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";
@@ -382,6 +449,40 @@ public class UserIntegrationTests {
                         assertEquals("admin", rs.getString("user_role"));
                         assertEquals(true, rs.getBoolean("are_workouts_public"));
                         assertEquals(65.33d, rs.getDouble("weight"));
+                    });
+        }
+
+        @Test
+        public void doesntTouchOmmitedFields() {
+            String json = "{\"username\":\"frank\"}";
+            String expectedJson = """
+                        {
+                            "username":"frank",
+                            "displayname":"Frank",
+                            "role": "admin",
+                            "weight": 65.2,
+                            "areWorkoutsPublic": true
+                        }
+                    """;
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.patch().uri("/users/frank")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isOk(),
+                            r -> r.expectBody().json(expectedJson));
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
+
+            jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+                    .query((rs) -> {
+                        assertEquals("Frank", rs.getString("displayname"));
+                        assertEquals("admin", rs.getString("user_role"));
+                        assertEquals(true, rs.getBoolean("are_workouts_public"));
+                        assertEquals(65.2d, rs.getDouble("weight"));
                     });
         }
 
@@ -421,6 +522,24 @@ public class UserIntegrationTests {
                         assertEquals(75d, rs.getDouble("weight"));
                     });
 
+        }
+
+        @Test
+        public void notFoundIfUserNotInDB() {
+            String username = "bob";
+            String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";
+
+            int rowsBefore = countRowsInTable(jdbc, "app_user");
+
+            rest.patch().uri("/users/{username}", username)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(json)
+                    .exchange()
+                    .expectStatus().isNotFound()
+                    .expectBody().isEmpty();
+
+            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            assertEquals(rowsBefore, rowsAfter);
         }
     }
 
