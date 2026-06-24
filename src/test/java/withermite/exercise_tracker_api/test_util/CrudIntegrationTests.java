@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api;
+package withermite.exercise_tracker_api.test_util;
 
 import java.net.URI;
 
@@ -23,8 +23,6 @@ import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import withermite.exercise_tracker_api.test_util.CrudTestInvocationContextProvider;
-
 @ClassTemplate
 @ExtendWith(CrudTestInvocationContextProvider.class)
 @SpringBootTest
@@ -42,12 +40,25 @@ public class CrudIntegrationTests {
     @Autowired
     private DataSource dataSource;
 
-    public ClassPathResource populateSql;
+    private final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
+    ClassPathResource populateSql;
+    String resourceUri;
+    String tableName;
+    String keyRowName;
+    String existingKey;
+    String newKey;
+
+    private String sqlSelectExisting() {
+        return "SELECT * FROM " + tableName + " WHERE " + keyRowName + " = '" + existingKey + "'";
+    }
+
+    private String sqlSelectNew() {
+        return "SELECT * FROM " + tableName + " WHERE " + keyRowName + " = '" + newKey + "'";
+    }
 
     @BeforeEach
     @SuppressWarnings("unused")
     void populateDB() {
-        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
         populator.addScript(populateSql);
         populator.execute(dataSource);
     }
@@ -56,7 +67,6 @@ public class CrudIntegrationTests {
     public class GetTests {
         @Test
         public void getsFromDB() {
-            String key = "frank";
 
             String expectedJson = """
                         {
@@ -68,15 +78,15 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.get().uri("/users/{key}", key)
+            rest.get().uri(resourceUri + "/{key}", existingKey)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
                             r -> r.expectBody().json(expectedJson));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
 
@@ -125,15 +135,15 @@ public class CrudIntegrationTests {
                         ]
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.get().uri("/users")
+            rest.get().uri(resourceUri)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
                             r -> r.expectBody().json(expectedJson));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
 
@@ -158,15 +168,15 @@ public class CrudIntegrationTests {
                         ]
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.get().uri("/users?limit=2&offset=2")
+            rest.get().uri(resourceUri + "?limit=2&offset=2")
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
                             r -> r.expectBody().json(expectedJson));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
 
@@ -174,16 +184,15 @@ public class CrudIntegrationTests {
 
         @Test
         public void notFoundIfRequestedNotInDB() {
-            String key = "bob";
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.get().uri("/users/{key}", key)
+            rest.get().uri(resourceUri + "/{key}", newKey)
                     .exchange()
                     .expectStatus().isNotFound()
                     .expectBody().isEmpty();
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
     }
@@ -209,19 +218,19 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.post().uri("/users")
+            rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isCreated(),
                             r -> r.expectBody().json(expectedJson));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(1, rowsAfter - rowsBefore);
 
-            jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+            jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
                         assertEquals("Bob", rs.getString("displayname"));
                         assertEquals("default", rs.getString("user_role"));
@@ -236,16 +245,16 @@ public class CrudIntegrationTests {
         public void badRequestIfMissingFields() {
             String json = "{\"username\": \"bob\"}";
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.post().uri("/users")
+            rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange()
                     .expectStatus().isBadRequest()
                     .expectBody().isEmpty();
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
 
@@ -261,16 +270,16 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.post().uri("/users")
+            rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange()
                     .expectStatus().isEqualTo(409)
                     .expectBody().isEmpty();
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
     }
@@ -289,19 +298,19 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.put().uri("/users/frank")
+            rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
                             r -> r.expectBody().json(json));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
-            jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+            jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
                         assertEquals("Frank69", rs.getString("displayname"));
                         assertEquals("default", rs.getString("user_role"));
@@ -328,19 +337,19 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.put().uri("/users/frank")
+            rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
                             r -> r.expectBody().json(expectedJson));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
-            jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+            jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
                         assertEquals("Frank", rs.getString("displayname"));
                         assertEquals("default", rs.getString("user_role"));
@@ -361,19 +370,19 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.put().uri("/users/bob")
+            rest.put().uri(resourceUri + "/{key}", newKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isCreated(),
                             r -> r.expectBody().json(json));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(1, rowsAfter - rowsBefore);
 
-            jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+            jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
                         assertEquals("Bob", rs.getString("displayname"));
                         assertEquals("admin", rs.getString("user_role"));
@@ -385,7 +394,7 @@ public class CrudIntegrationTests {
         @Test
         public void seeOtherStatusWhenKeyChanges() {
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/users/bob").build().toUri();
+                    .path(resourceUri + "/{key}").build(newKey);
 
             String json = """
                         {
@@ -397,9 +406,9 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.put().uri("/users/frank")
+            rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(
@@ -407,10 +416,10 @@ public class CrudIntegrationTests {
                                     .expectHeader().location(location.toString()),
                             r -> r.expectBody().json(json));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
-            jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+            jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
                         assertEquals("Bob", rs.getString("displayname"));
                         assertEquals("default", rs.getString("user_role"));
@@ -425,16 +434,16 @@ public class CrudIntegrationTests {
         public void badRequestIfMissingFields() {
             String json = "{\"displayname\": \"frank69\"}";
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.put().uri("/users/frank")
+            rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange()
                     .expectStatus().isBadRequest()
                     .expectBody().isEmpty();
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
     }
@@ -454,19 +463,19 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.patch().uri("/users/frank")
+            rest.patch().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
                             r -> r.expectBody().json(expectedJson));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
-            jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+            jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
                         assertEquals("frank69", rs.getString("displayname"));
                         assertEquals("admin", rs.getString("user_role"));
@@ -488,19 +497,19 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.patch().uri("/users/frank")
+            rest.patch().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
                             r -> r.expectBody().json(expectedJson));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
-            jdbc.sql("SELECT * FROM app_user WHERE username = 'frank'")
+            jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
                         assertEquals("Frank", rs.getString("displayname"));
                         assertEquals("admin", rs.getString("user_role"));
@@ -512,7 +521,7 @@ public class CrudIntegrationTests {
         @Test
         public void seeOtherStatusWhenKeyChanges() {
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/users/bob").build().toUri();
+                    .path(resourceUri + "/{key}").build(newKey);
 
             String json = """
                         {
@@ -524,9 +533,9 @@ public class CrudIntegrationTests {
                         }
                     """;
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.put().uri("/users/frank")
+            rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange().expectAll(
@@ -534,10 +543,10 @@ public class CrudIntegrationTests {
                                     .expectHeader().location(location.toString()),
                             r -> r.expectBody().json(json));
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
-            jdbc.sql("SELECT * FROM app_user WHERE username = 'bob'")
+            jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
                         assertEquals("Bob", rs.getString("displayname"));
                         assertEquals("default", rs.getString("user_role"));
@@ -547,21 +556,21 @@ public class CrudIntegrationTests {
 
         }
 
+        // Error tests
         @Test
         public void notFoundIfNotInDB() {
-            String key = "bob";
             String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.patch().uri("/users/{key}", key)
+            rest.patch().uri(resourceUri + "/{key}", newKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(json)
                     .exchange()
                     .expectStatus().isNotFound()
                     .expectBody().isEmpty();
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
     }
@@ -570,32 +579,30 @@ public class CrudIntegrationTests {
     public class DeleteTests {
         @Test
         public void deletesInDB() {
-            String key = "frank";
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.delete().uri("/users/{key}", key)
+            rest.delete().uri(resourceUri + "/{key}", existingKey)
                     .exchange()
                     .expectStatus().isNoContent()
                     .expectBody().isEmpty();
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore - 1, rowsAfter);
         }
 
         // Error tests
         @Test
         public void notFoundIfNotInDB() {
-            String key = "bob";
 
-            int rowsBefore = countRowsInTable(jdbc, "app_user");
+            int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.delete().uri("/users/{key}", key)
+            rest.delete().uri(resourceUri + "/{key}", newKey)
                     .exchange()
                     .expectStatus().isNotFound()
                     .expectBody().isEmpty();
 
-            int rowsAfter = countRowsInTable(jdbc, "app_user");
+            int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
     }
