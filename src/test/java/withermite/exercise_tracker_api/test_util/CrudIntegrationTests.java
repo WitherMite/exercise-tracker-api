@@ -42,6 +42,7 @@ public class CrudIntegrationTests {
 
     private final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
     ClassPathResource populateSql;
+    CrudTestData testData;
     String resourceUri;
     String tableName;
     String keyRowName;
@@ -68,15 +69,7 @@ public class CrudIntegrationTests {
         @Test
         public void getsFromDB() {
 
-            String expectedJson = """
-                        {
-                            "username":"frank",
-                            "displayname":"Frank",
-                            "role": "admin",
-                            "weight": 65.2,
-                            "areWorkoutsPublic": true
-                        }
-                    """;
+            String expectedJson = testData.readOneExisting.expectedJson;
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -89,6 +82,8 @@ public class CrudIntegrationTests {
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
+
+        // Pagination tests (need to fix expecting db order with no order by clause)
 
         @Test
         public void getsManyFromDB() {
@@ -201,22 +196,8 @@ public class CrudIntegrationTests {
     public class PostTests {
         @Test
         public void postsToDB() {
-            String json = """
-                        {
-                            "username":"bob",
-                            "displayname":"Bob",
-                            "weight": 65.2
-                        }
-                    """;
-            String expectedJson = """
-                        {
-                            "username":"bob",
-                            "displayname":"Bob",
-                            "role": "default",
-                            "weight": 65.2,
-                            "areWorkoutsPublic": false
-                        }
-                    """;
+            String json = testData.createOneUniqueMinimumFields.inputJson;
+            String expectedJson = testData.createOneUniqueMinimumFields.expectedJson;
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -232,10 +213,8 @@ public class CrudIntegrationTests {
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
-                        assertEquals("Bob", rs.getString("displayname"));
-                        assertEquals("default", rs.getString("user_role"));
-                        assertEquals(false, rs.getBoolean("are_workouts_public"));
-                        assertEquals(65.2d, rs.getDouble("weight"));
+                        CrudTestData.DataGroup td = testData.createOneUniqueMinimumFields;
+                        td.assertDbState(rs);
                     });
         }
 

@@ -1,6 +1,7 @@
 package withermite.exercise_tracker_api.test_util;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.extension.ClassTemplateInvocationContext;
@@ -59,6 +60,40 @@ public class CrudTestInvocationContextProvider implements ClassTemplateInvocatio
                                 crudTests.resourceUri = "/users";
                                 crudTests.existingKey = "frank";
                                 crudTests.newKey = "bob";
+                                CrudTestData testData = new CrudTestData();
+                                // temporary until i think of better way to define these
+                                testData.readOneExisting = testData.new DataGroup("""
+                                                {
+                                                    "username":"frank",
+                                                    "displayname":"Frank",
+                                                    "role": "admin",
+                                                    "weight": 65.2,
+                                                    "areWorkoutsPublic": true
+                                                }
+                                        """);
+
+                                testData.createOneUniqueMinimumFields = testData.new DataGroup("""
+                                            {
+                                                "username":"bob",
+                                                "displayname":"Bob",
+                                                "weight": 65.2
+                                            }
+                                        """,
+                                        """
+                                                    {
+                                                        "username":"bob",
+                                                        "displayname":"Bob",
+                                                        "role": "default",
+                                                        "weight": 65.2,
+                                                        "areWorkoutsPublic": false
+                                                    }
+                                                """,
+                                        Map.of(
+                                                "displayname", "Bob",
+                                                "user_role", "default",
+                                                "are_workouts_public", false,
+                                                "weight", 65.2d));
+                                crudTests.testData = testData;
                             }
                         });
             }
