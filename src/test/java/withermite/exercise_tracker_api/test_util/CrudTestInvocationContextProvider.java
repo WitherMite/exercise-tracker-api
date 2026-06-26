@@ -11,6 +11,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.springframework.core.io.ClassPathResource;
 
+import withermite.exercise_tracker_api.test_util.data_providers.CrudTestData;
+import withermite.exercise_tracker_api.test_util.data_providers.DataGroup;
+
 public class CrudTestInvocationContextProvider implements ClassTemplateInvocationContextProvider {
 
     @Override
@@ -60,40 +63,50 @@ public class CrudTestInvocationContextProvider implements ClassTemplateInvocatio
                                 crudTests.resourceUri = "/users";
                                 crudTests.existingKey = "frank";
                                 crudTests.newKey = "bob";
-                                CrudTestData testData = new CrudTestData();
-                                // temporary until i think of better way to define these
-                                testData.readOneExisting = testData.new DataGroup("""
-                                                {
-                                                    "username":"frank",
-                                                    "displayname":"Frank",
-                                                    "role": "admin",
-                                                    "weight": 65.2,
-                                                    "areWorkoutsPublic": true
-                                                }
-                                        """);
+                                // ideally, the final generator function reads from a json file or something
+                                CrudTestData testData = new CrudTestData((key, data) -> {
+                                    switch (key) {
+                                        case ReadOneExisting -> {
+                                            return new DataGroup("""
+                                                            {
+                                                                "username":"frank",
+                                                                "displayname":"Frank",
+                                                                "role": "admin",
+                                                                "weight": 65.2,
+                                                                "areWorkoutsPublic": true
+                                                            }
+                                                    """);
+                                        }
+                                        case CreateOneUniqueMinimumFields -> {
+                                            return new DataGroup("""
+                                                                {
+                                                                    "username":"bob",
+                                                                    "displayname":"Bob",
+                                                                    "weight": 65.2
+                                                                }
+                                                    """,
+                                                    """
+                                                                {
+                                                                    "username":"bob",
+                                                                    "displayname":"Bob",
+                                                                    "role": "default",
+                                                                    "weight": 65.2,
+                                                                    "areWorkoutsPublic": false
+                                                                }
+                                                            """,
+                                                    Map.of(
+                                                            "displayname", "Bob",
+                                                            "user_role", "default",
+                                                            "are_workouts_public", false,
+                                                            "weight", 65.2d));
+                                        }
+                                        default -> {
+                                            return data;
+                                        }
+                                    }
+                                });
 
-                                testData.createOneUniqueMinimumFields = testData.new DataGroup("""
-                                            {
-                                                "username":"bob",
-                                                "displayname":"Bob",
-                                                "weight": 65.2
-                                            }
-                                        """,
-                                        """
-                                                    {
-                                                        "username":"bob",
-                                                        "displayname":"Bob",
-                                                        "role": "default",
-                                                        "weight": 65.2,
-                                                        "areWorkoutsPublic": false
-                                                    }
-                                                """,
-                                        Map.of(
-                                                "displayname", "Bob",
-                                                "user_role", "default",
-                                                "are_workouts_public", false,
-                                                "weight", 65.2d));
-                                crudTests.testData = testData;
+                                crudTests.testData = testData.testCases;
                             }
                         });
             }

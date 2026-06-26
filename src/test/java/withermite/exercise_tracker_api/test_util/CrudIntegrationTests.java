@@ -1,6 +1,7 @@
 package withermite.exercise_tracker_api.test_util;
 
 import java.net.URI;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -23,6 +24,9 @@ import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import withermite.exercise_tracker_api.test_util.data_providers.CrudTestData.CaseType;
+import withermite.exercise_tracker_api.test_util.data_providers.DataGroup;
+
 @ClassTemplate
 @ExtendWith(CrudTestInvocationContextProvider.class)
 @SpringBootTest
@@ -42,7 +46,7 @@ public class CrudIntegrationTests {
 
     private final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
     ClassPathResource populateSql;
-    CrudTestData testData;
+    Map<CaseType, DataGroup> testData;
     String resourceUri;
     String tableName;
     String keyRowName;
@@ -68,8 +72,8 @@ public class CrudIntegrationTests {
     public class GetTests {
         @Test
         public void getsFromDB() {
-
-            String expectedJson = testData.readOneExisting.expectedJson;
+            DataGroup data = testData.get(CaseType.ReadOneExisting);
+            String expectedJson = data.expectedJson;
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -196,25 +200,23 @@ public class CrudIntegrationTests {
     public class PostTests {
         @Test
         public void postsToDB() {
-            String json = testData.createOneUniqueMinimumFields.inputJson;
-            String expectedJson = testData.createOneUniqueMinimumFields.expectedJson;
+            DataGroup data = testData.get(CaseType.CreateOneUniqueMinimumFields);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange().expectAll(
                             r -> r.expectStatus().isCreated(),
-                            r -> r.expectBody().json(expectedJson));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(1, rowsAfter - rowsBefore);
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
-                        CrudTestData.DataGroup td = testData.createOneUniqueMinimumFields;
-                        td.assertDbState(rs);
+                        data.assertDbState(rs);
                     });
         }
 
