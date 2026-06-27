@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class DataGroup {
     public String inputJson;
     public String expectedJson;
-    public Map<String, Object> expectedDbRowState;
+    private final Map<String, Object> expectedDbRowState;
 
     public void assertDbState(ResultSet rs) {
         if (expectedDbRowState.isEmpty()) {

@@ -1,19 +1,22 @@
 package withermite.exercise_tracker_api.test_config;
 
+import org.springframework.core.io.FileSystemResource;
+
 import withermite.exercise_tracker_api.test_util.CrudIntegrationTestContext;
 
 public class CrudTestsConfig {
-    // list json sources for test data here
-    // private final String[] jsonSources = {};
+    private final String filePrefix = "src/test/resources/";
+    // list json sources and DTO classes for test data here
+    private final String[] jsonSources = { "user/test-data.json" };
 
     public final CrudIntegrationTestContext[] contexts;
 
     public CrudTestsConfig() {
-        // change to create all the contexts for each json source
-        // could be helpful to also generate blank json template in any listed source
-        // paths that arent complete
-        this.contexts = new CrudIntegrationTestContext[] {
-                new CrudIntegrationTestContext()
-        };
+        this.contexts = new CrudIntegrationTestContext[jsonSources.length];
+
+        for (int i = 0; i < jsonSources.length; i++) {
+            FileSystemResource json = new FileSystemResource(filePrefix + jsonSources[i]);
+            this.contexts[i] = new CrudIntegrationTestContext(json);
+        }
     }
 }

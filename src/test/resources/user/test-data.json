@@ -1,0 +1,92 @@
+{
+    "testName": "User CRUD Integration Tests",
+    "resourceUri": "/users",
+    "tableName": "app_user",
+    "keyRowName": "username",
+    "existingKey": "frank",
+    "newKey": "bob",
+    "populateSqlPath": "testsql/user/populate-app-user.sql",
+    "testData": {
+        "FailNotEnoughFields": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "FailUpdateNotExists": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "ReadOneExisting": {
+            "inputJson": {},
+            "expectedJson": {
+                "username": "frank",
+                "displayname": "Frank",
+                "role": "admin",
+                "weight": 65.2,
+                "areWorkoutsPublic": true
+            },
+            "expectedDbRowState": {}
+        },
+        "ReadFiveExisting": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "ReadThirdAndFourthExisting": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "CreateOneUniqueMinimumFields": {
+            "inputJson": {
+                "username": "bob",
+                "displayname": "Bob",
+                "weight": 65.2
+            },
+            "expectedJson": {
+                "username": "bob",
+                "displayname": "Bob",
+                "role": "default",
+                "weight": 65.2,
+                "areWorkoutsPublic": false
+            },
+            "expectedDbRowState": {}
+        },
+        "ReplaceOneExisting": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "ReplaceOneExistingMinumumFields": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "ReplaceOneUnique": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "ReplaceOneExistingNewKey": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "UpdateOneExisting": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "UpdateOneExistingMinimumFields": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        },
+        "UpdateOneExistingNewKey": {
+            "inputJson": {},
+            "expectedJson": {},
+            "expectedDbRowState": {}
+        }
+    }
+}

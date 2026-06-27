@@ -1,63 +1,102 @@
 package withermite.exercise_tracker_api.test_util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.NullNode;
+import tools.jackson.databind.node.ObjectNode;
 import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData;
+import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData.CaseType;
 import withermite.exercise_tracker_api.test_util.data_structures.DataGroup;
 
 public class CrudIntegrationTestContext {
-    // change to a class who's constructor takes in json and populates these fields
-    // and have config class let list json classpaths for each endpoint to test
+    private static final JsonMapper mapper = JsonMapper.builder().build();
+
+    private static void writeConfigStructureJson(FileSystemResource json) {
+        // create root node for tree
+        ObjectNode blankConfig = mapper.createObjectNode();
+        // generate empty string fields
+        blankConfig.put("testName", "");
+        blankConfig.put("resourceUri", "");
+        blankConfig.put("tableName", "");
+        blankConfig.put("keyRowName", "");
+        blankConfig.put("existingKey", "");
+        blankConfig.put("newKey", "");
+        blankConfig.put("populateSqlPath", "");
+        // generate empty test cases
+        ObjectNode testDataJson = blankConfig.putObject("testData");
+        for (CaseType type : CaseType.values()) {
+            // create an object for each test case with three blank objects
+            ObjectNode testCase = testDataJson.putObject(type.toString());
+            testCase.putObject("inputJson");
+            testCase.putObject("expectedJson");
+            testCase.putObject("expectedDbRowState");
+        }
+        // write to file
+        mapper.writerWithDefaultPrettyPrinter()
+                .writeValue(json.getFile(), blankConfig);
+    }
+
+    String testName;
+    String resourceUri;
+    String tableName;
+    String keyRowName;
+    String existingKey;
+    String newKey;
+    ClassPathResource populateSql;
+    CrudTestData testData;
+
     // hard problem to solve for asserting db state is how to get the correct type
     // for fields that are vague in json like numbers
-    final String displayName = "User CRUD Integration Tests";
-    final String resourceUri = "/users";
-    final String tableName = "app_user";
-    final String keyRowName = "username";
-    final String existingKey = "frank";
-    final String newKey = "bob";
-    final ClassPathResource populateSql = new ClassPathResource("testsql/user/populate-app-user.sql");
-    final CrudTestData testData = new CrudTestData((key, data) -> {
-        switch (key) {
-            case ReadOneExisting -> {
-                return new DataGroup("""
-                                {
-                                    "username":"frank",
-                                    "displayname":"Frank",
-                                    "role": "admin",
-                                    "weight": 65.2,
-                                    "areWorkoutsPublic": true
-                                }
-                        """);
+
+    public CrudIntegrationTestContext(FileSystemResource json) {
+        try (InputStream stream = json.getInputStream()) {
+            // traverse the stream as a tree
+            JsonNode node = mapper.readTree(stream);
+
+            // if file is empty write blank structure to file and skip init
+            if (node == null || node.isNull() || node.isEmpty()) {
+                writeConfigStructureJson(json);
+                return;
             }
-            case CreateOneUniqueMinimumFields -> {
-                return new DataGroup("""
-                                    {
-                                        "username":"bob",
-                                        "displayname":"Bob",
-                                        "weight": 65.2
-                                    }
-                        """,
-                        """
-                                    {
-                                        "username":"bob",
-                                        "displayname":"Bob",
-                                        "role": "default",
-                                        "weight": 65.2,
-                                        "areWorkoutsPublic": false
-                                    }
-                                """,
-                        Map.of(
+
+            // set string properties
+            this.testName = node.get("testName").asString();
+            this.resourceUri = node.get("resourceUri").asString();
+            this.tableName = node.get("tableName").asString();
+            this.keyRowName = node.get("keyRowName").asString();
+            this.existingKey = node.get("existingKey").asString();
+            this.newKey = node.get("newKey").asString();
+            this.populateSql = new ClassPathResource(node.get("populateSqlPath").asString());
+
+            // populate test cases
+            JsonNode testDataJson = node.get("testData");
+
+            this.testData = new CrudTestData((key, data) -> {
+                JsonNode testCase = testDataJson.get(key.toString());
+
+                if (testCase == null || testCase instanceof NullNode)
+                    return data;
+
+                return new DataGroup(
+                        testCase.get("inputJson").toString(),
+                        testCase.get("expectedJson").toString(),
+                        // unsure how to handle the vague json types for the expected db state map
+                        Map.of( // temp hardcoded for CreateOneUniqueMinimumFields
                                 "displayname", "Bob",
                                 "user_role", "default",
                                 "are_workouts_public", false,
                                 "weight", 65.2d));
-            }
-            default -> {
-                return data;
-            }
+            });
+
+        } catch (IOException e) {
+            System.err.println(e);
         }
-    });
+    }
 }

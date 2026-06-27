@@ -42,7 +42,7 @@ public class CrudIntegrationTestContextProvider implements ClassTemplateInvocati
         return new ClassTemplateInvocationContext() {
             @Override
             public String getDisplayName(int invocationIndex) {
-                return ctx.displayName;
+                return ctx.testName;
             }
 
             @Override
@@ -64,5 +64,4 @@ public class CrudIntegrationTestContextProvider implements ClassTemplateInvocati
             }
         };
     }
-
 }
