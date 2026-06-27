@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.test_util.data_providers;
+package withermite.exercise_tracker_api.test_util.data_structures;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

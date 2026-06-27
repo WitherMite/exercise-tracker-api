@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.test_util;
+package withermite.exercise_tracker_api.integration_tests;
 
 import java.net.URI;
 import java.util.Map;
@@ -24,11 +24,12 @@ import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import withermite.exercise_tracker_api.test_util.data_providers.CrudTestData.CaseType;
-import withermite.exercise_tracker_api.test_util.data_providers.DataGroup;
+import withermite.exercise_tracker_api.test_util.CrudIntegrationTestContextProvider;
+import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData.CaseType;
+import withermite.exercise_tracker_api.test_util.data_structures.DataGroup;
 
 @ClassTemplate
-@ExtendWith(CrudTestInvocationContextProvider.class)
+@ExtendWith(CrudIntegrationTestContextProvider.class)
 @SpringBootTest
 @AutoConfigureRestTestClient
 @Sql("/db/seed-schema.sql")
@@ -45,13 +46,13 @@ public class CrudIntegrationTests {
     private DataSource dataSource;
 
     private final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
-    ClassPathResource populateSql;
-    Map<CaseType, DataGroup> testData;
-    String resourceUri;
-    String tableName;
-    String keyRowName;
-    String existingKey;
-    String newKey;
+    public ClassPathResource populateSql;
+    public Map<CaseType, DataGroup> testCases;
+    public String resourceUri;
+    public String tableName;
+    public String keyRowName;
+    public String existingKey;
+    public String newKey;
 
     private String sqlSelectExisting() {
         return "SELECT * FROM " + tableName + " WHERE " + keyRowName + " = '" + existingKey + "'";
@@ -72,8 +73,7 @@ public class CrudIntegrationTests {
     public class GetTests {
         @Test
         public void getsFromDB() {
-            DataGroup data = testData.get(CaseType.ReadOneExisting);
-            String expectedJson = data.expectedJson;
+            DataGroup data = testCases.get(CaseType.ReadOneExisting);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -81,7 +81,7 @@ public class CrudIntegrationTests {
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(expectedJson));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -200,7 +200,7 @@ public class CrudIntegrationTests {
     public class PostTests {
         @Test
         public void postsToDB() {
-            DataGroup data = testData.get(CaseType.CreateOneUniqueMinimumFields);
+            DataGroup data = testCases.get(CaseType.CreateOneUniqueMinimumFields);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 

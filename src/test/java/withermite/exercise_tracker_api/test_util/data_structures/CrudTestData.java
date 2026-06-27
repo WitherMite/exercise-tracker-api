@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.test_util.data_providers;
+package withermite.exercise_tracker_api.test_util.data_structures;
 
 import java.util.HashMap;
 import java.util.Map;
