@@ -26,8 +26,8 @@ public class CrudIntegrationTestContextProvider implements ClassTemplateInvocati
 
         for (int i = 0; i < configSources.length; i++) {
             var config = configSources[i];
-            FileSystemResource json = new FileSystemResource(filePrefix + config.jsonFilepath());
-            this.configs[i] = new CrudIntegrationTestContext(json, config.dbStateMap());
+            FileSystemResource json = new FileSystemResource(filePrefix + config.getJsonFilepath());
+            this.configs[i] = new CrudIntegrationTestContext(json, config.getJsonPropToDbRowMap());
         }
     }
 

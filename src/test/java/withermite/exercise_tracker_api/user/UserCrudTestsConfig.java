@@ -3,25 +3,25 @@ package withermite.exercise_tracker_api.user;
 import java.util.Map;
 
 import withermite.exercise_tracker_api.test_util.CrudIntegrationTestsConfig;
-import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData.CaseType;
 
 public class UserCrudTestsConfig implements CrudIntegrationTestsConfig {
     @Override
-    public String jsonFilepath() {
+    public String getJsonFilepath() {
         return "user/test-data.json";
     }
 
-    // maybe change to be instructions to build this
-    // from expectedJson ObjectNode (abstracting thats what its doing)
-    // instead of making the entire map manually?
     @Override
-    public Map<CaseType, Map<String, Object>> dbStateMap() {
+    public Map<String, DBRowType> getJsonPropToDbRowMap() {
         return Map.of(
-                CaseType.CreateOneUniqueMinimumFields,
-                Map.of( // temp hardcoded for CreateOneUniqueMinimumFields
-                        "displayname", "Bob",
-                        "user_role", "default",
-                        "are_workouts_public", false,
-                        "weight", 65.2d));
+                "username",
+                new DBRowType("username", String.class),
+                "displayname",
+                new DBRowType("displayname", String.class),
+                "role",
+                new DBRowType("user_role", String.class),
+                "areWorkoutsPublic",
+                new DBRowType("are_workouts_public", Boolean.class),
+                "weight",
+                new DBRowType("weight", Double.class));
     }
 }

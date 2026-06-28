@@ -10,23 +10,26 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class DataGroup {
     public final String inputJson;
     public final String expectedJson;
-    private final Map<String, Object> expectedDbRowState;
+    private final Map<String, ExpectedObject> expectedDbRowState;
+
+    public record ExpectedObject(Object value, Class<?> type) {
+    };
 
     public void assertDbState(ResultSet rs) {
         if (expectedDbRowState.isEmpty()) {
             fail("no expected database state to assert");
         }
 
-        expectedDbRowState.forEach((columnName, expectedValue) -> {
+        expectedDbRowState.forEach((columnName, expected) -> {
             try {
-                assertEquals(expectedValue, rs.getObject(columnName, expectedValue.getClass()));
+                assertEquals(expected.value(), rs.getObject(columnName, expected.type()));
             } catch (SQLException e) {
                 fail(e);
             }
         });
     }
 
-    public DataGroup(String inputJson, String expectedJson, Map<String, Object> expectedDbRowState) {
+    public DataGroup(String inputJson, String expectedJson, Map<String, ExpectedObject> expectedDbRowState) {
         this.inputJson = inputJson;
         this.expectedJson = expectedJson;
         this.expectedDbRowState = expectedDbRowState;

@@ -2,10 +2,11 @@ package withermite.exercise_tracker_api.test_util;
 
 import java.util.Map;
 
-import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData.CaseType;
-
 public interface CrudIntegrationTestsConfig {
-    public String jsonFilepath();
+    public record DBRowType(String rowName, Class<?> type) {
+    }
 
-    public Map<CaseType, Map<String, Object>> dbStateMap();
+    public String getJsonFilepath();
+
+    public Map<String, DBRowType> getJsonPropToDbRowMap();
 }

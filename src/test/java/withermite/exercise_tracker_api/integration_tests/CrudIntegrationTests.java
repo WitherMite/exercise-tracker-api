@@ -220,10 +220,7 @@ public class CrudIntegrationTests {
 
             jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
-                        assertEquals("Frank69", rs.getString("displayname"));
-                        assertEquals("default", rs.getString("user_role"));
-                        assertEquals(true, rs.getBoolean("are_workouts_public"));
-                        assertEquals(75d, rs.getDouble("weight"));
+                        data.assertDbState(rs);
                     });
         }
 
@@ -245,10 +242,7 @@ public class CrudIntegrationTests {
 
             jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
-                        assertEquals("Frank", rs.getString("displayname"));
-                        assertEquals("default", rs.getString("user_role"));
-                        assertEquals(false, rs.getBoolean("are_workouts_public"));
-                        assertEquals(null, rs.getObject("weight", Double.class));
+                        data.assertDbState(rs);
                     });
         }
 
@@ -270,10 +264,7 @@ public class CrudIntegrationTests {
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
-                        assertEquals("Bob", rs.getString("displayname"));
-                        assertEquals("admin", rs.getString("user_role"));
-                        assertEquals(true, rs.getBoolean("are_workouts_public"));
-                        assertEquals(72.4d, rs.getDouble("weight"));
+                        data.assertDbState(rs);
                     });
         }
 
@@ -298,10 +289,7 @@ public class CrudIntegrationTests {
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
-                        assertEquals("Bob", rs.getString("displayname"));
-                        assertEquals("default", rs.getString("user_role"));
-                        assertEquals(true, rs.getBoolean("are_workouts_public"));
-                        assertEquals(75d, rs.getDouble("weight"));
+                        data.assertDbState(rs);
                     });
 
         }
@@ -345,10 +333,7 @@ public class CrudIntegrationTests {
 
             jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
-                        assertEquals("frank69", rs.getString("displayname"));
-                        assertEquals("admin", rs.getString("user_role"));
-                        assertEquals(true, rs.getBoolean("are_workouts_public"));
-                        assertEquals(65.33d, rs.getDouble("weight"));
+                        data.assertDbState(rs);
                     });
         }
 
@@ -370,10 +355,7 @@ public class CrudIntegrationTests {
 
             jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
-                        assertEquals("Frank", rs.getString("displayname"));
-                        assertEquals("admin", rs.getString("user_role"));
-                        assertEquals(true, rs.getBoolean("are_workouts_public"));
-                        assertEquals(65.2d, rs.getDouble("weight"));
+                        data.assertDbState(rs);
                     });
         }
 
@@ -398,10 +380,7 @@ public class CrudIntegrationTests {
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
-                        assertEquals("Bob", rs.getString("displayname"));
-                        assertEquals("default", rs.getString("user_role"));
-                        assertEquals(true, rs.getBoolean("are_workouts_public"));
-                        assertEquals(75d, rs.getDouble("weight"));
+                        data.assertDbState(rs);
                     });
 
         }

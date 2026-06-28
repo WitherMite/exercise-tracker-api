@@ -2,6 +2,7 @@ package withermite.exercise_tracker_api.test_util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.core.io.ClassPathResource;
@@ -11,9 +12,11 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.NullNode;
 import tools.jackson.databind.node.ObjectNode;
+import withermite.exercise_tracker_api.test_util.CrudIntegrationTestsConfig.DBRowType;
 import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData;
 import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData.CaseType;
 import withermite.exercise_tracker_api.test_util.data_structures.DataGroup;
+import withermite.exercise_tracker_api.test_util.data_structures.DataGroup.ExpectedObject;
 
 public class CrudIntegrationTestContext {
     private static final JsonMapper mapper = JsonMapper.builder().build();
@@ -42,6 +45,25 @@ public class CrudIntegrationTestContext {
                 .writeValue(json.getFile(), blankConfig);
     }
 
+    private static Object castJsonNode(JsonNode node, Class<?> type) {
+        if (node.isNull())
+            return null;
+
+        return switch (type.getSimpleName()) {
+            case "String" -> node.asString();
+            case "Boolean" -> node.asBoolean();
+            case "Byte" -> node.asInt();
+            case "Short" -> node.asShort();
+            case "Integer" -> node.asInt();
+            case "Long" -> node.asLong();
+            case "Float" -> node.asFloat();
+            case "Double" -> node.asDouble();
+            case "BigInteger" -> node.asBigInteger();
+            case "BigDecimal" -> node.asDecimal();
+            default -> node;
+        };
+    }
+
     String testName;
     String resourceUri;
     String tableName;
@@ -51,7 +73,7 @@ public class CrudIntegrationTestContext {
     ClassPathResource populateSql;
     CrudTestData testData;
 
-    public CrudIntegrationTestContext(FileSystemResource json, Map<CaseType, Map<String, Object>> dbStateMap) {
+    public CrudIntegrationTestContext(FileSystemResource json, Map<String, DBRowType> jsonPropToDbRowMap) {
         try (InputStream stream = json.getInputStream()) {
             // traverse the stream as a tree
             JsonNode node = mapper.readTree(stream);
@@ -80,10 +102,23 @@ public class CrudIntegrationTestContext {
                 if (testCase == null || testCase instanceof NullNode)
                     return data;
 
+                // build db state map
+                JsonNode expectedJson = testCase.get("expectedJson");
+                Map<String, ExpectedObject> expectedDbRowState = new HashMap<>();
+
+                expectedJson.forEachEntry((prop, valNode) -> {
+                    DBRowType row = jsonPropToDbRowMap.get(prop);
+                    Object expectedVal = castJsonNode(valNode, row.type());
+
+                    expectedDbRowState.put(
+                            row.rowName(),
+                            new ExpectedObject(expectedVal, row.type()));
+                });
+
                 return new DataGroup(
                         testCase.get("inputJson").toString(),
-                        testCase.get("expectedJson").toString(),
-                        dbStateMap.get(key));
+                        expectedJson.toString(),
+                        expectedDbRowState);
             });
 
         } catch (IOException e) {
