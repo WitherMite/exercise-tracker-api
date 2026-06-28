@@ -8,12 +8,28 @@ import org.junit.jupiter.api.extension.ClassTemplateInvocationContextProvider;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
+import org.springframework.core.io.FileSystemResource;
 
 import withermite.exercise_tracker_api.integration_tests.CrudIntegrationTests;
-import withermite.exercise_tracker_api.test_config.CrudTestsConfig;
+import withermite.exercise_tracker_api.user.UserCrudTestsConfig;
 
 public class CrudIntegrationTestContextProvider implements ClassTemplateInvocationContextProvider {
-    private final CrudTestsConfig config = new CrudTestsConfig();
+    // list config sources here
+    private final CrudIntegrationTestsConfig[] configSources = {
+            new UserCrudTestsConfig()
+    };
+    private final String filePrefix = "src/test/resources/";
+    private final CrudIntegrationTestContext[] configs;
+
+    public CrudIntegrationTestContextProvider() {
+        this.configs = new CrudIntegrationTestContext[configSources.length];
+
+        for (int i = 0; i < configSources.length; i++) {
+            var config = configSources[i];
+            FileSystemResource json = new FileSystemResource(filePrefix + config.jsonFilepath());
+            this.configs[i] = new CrudIntegrationTestContext(json, config.dbStateMap());
+        }
+    }
 
     @Override
     public boolean supportsClassTemplate(ExtensionContext context) {
@@ -29,7 +45,7 @@ public class CrudIntegrationTestContextProvider implements ClassTemplateInvocati
         Stream.Builder<ClassTemplateInvocationContext> contexts = Stream.builder();
 
         // add all test contexts to stream
-        for (CrudIntegrationTestContext ctx : config.contexts) {
+        for (CrudIntegrationTestContext ctx : configs) {
             contexts.add(getContext(ctx));
         }
 
@@ -48,7 +64,7 @@ public class CrudIntegrationTestContextProvider implements ClassTemplateInvocati
             @Override
             public List<Extension> getAdditionalExtensions() {
                 return List.of(
-                        (TestInstancePostProcessor) (Object testInstance, ExtensionContext context) -> {
+                        (TestInstancePostProcessor) (Object testInstance, ExtensionContext eContext) -> {
                             // inject fields to only outer class, the context provider loops through all
                             // the nested classes (and maybe methods?)
                             if (testInstance instanceof CrudIntegrationTests crudTests) {

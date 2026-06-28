@@ -8,14 +8,12 @@
     "populateSqlPath": "testsql/user/populate-app-user.sql",
     "testData": {
         "FailNotEnoughFields": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": { "username": "bob" },
+            "expectedJson": {}
         },
         "FailUpdateNotExists": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": { "displayname": "frank69", "weight": 65.33 },
+            "expectedJson": {}
         },
         "ReadOneExisting": {
             "inputJson": {},
@@ -25,18 +23,66 @@
                 "role": "admin",
                 "weight": 65.2,
                 "areWorkoutsPublic": true
-            },
-            "expectedDbRowState": {}
+            }
         },
         "ReadFiveExisting": {
             "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "expectedJson": [
+                {
+                    "username": "frank",
+                    "displayname": "Frank",
+                    "role": "admin",
+                    "weight": 65.2,
+                    "areWorkoutsPublic": true
+                },
+                {
+                    "username": "frank2",
+                    "displayname": "Frank",
+                    "role": "admin",
+                    "weight": 65.2,
+                    "areWorkoutsPublic": true
+                },
+                {
+                    "username": "frank3",
+                    "displayname": "Frank",
+                    "role": "admin",
+                    "weight": 65.2,
+                    "areWorkoutsPublic": true
+                },
+                {
+                    "username": "frank4",
+                    "displayname": "Frank",
+                    "role": "admin",
+                    "weight": 65.2,
+                    "areWorkoutsPublic": true
+                },
+                {
+                    "username": "frank5",
+                    "displayname": "Frank",
+                    "role": "admin",
+                    "weight": 65.2,
+                    "areWorkoutsPublic": true
+                }
+            ]
         },
         "ReadThirdAndFourthExisting": {
             "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "expectedJson": [
+                {
+                    "username": "frank3",
+                    "displayname": "Frank",
+                    "role": "admin",
+                    "weight": 65.2,
+                    "areWorkoutsPublic": true
+                },
+                {
+                    "username": "frank4",
+                    "displayname": "Frank",
+                    "role": "admin",
+                    "weight": 65.2,
+                    "areWorkoutsPublic": true
+                }
+            ]
         },
         "CreateOneUniqueMinimumFields": {
             "inputJson": {
@@ -50,43 +96,104 @@
                 "role": "default",
                 "weight": 65.2,
                 "areWorkoutsPublic": false
-            },
-            "expectedDbRowState": {}
+            }
         },
         "ReplaceOneExisting": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": {
+                "username": "frank",
+                "displayname": "Frank69",
+                "role": "default",
+                "weight": 75,
+                "areWorkoutsPublic": true
+            },
+            "expectedJson": {
+                "username": "frank",
+                "displayname": "Frank69",
+                "role": "default",
+                "weight": 75,
+                "areWorkoutsPublic": true
+            }
         },
         "ReplaceOneExistingMinumumFields": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": {
+                "username": "frank",
+                "displayname": "Frank"
+            },
+            "expectedJson": {
+                "username": "frank",
+                "displayname": "Frank",
+                "role": "default",
+                "weight": null,
+                "areWorkoutsPublic": false
+            }
         },
         "ReplaceOneUnique": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": {
+                "username": "bob",
+                "displayname": "Bob",
+                "role": "admin",
+                "weight": 72.4,
+                "areWorkoutsPublic": true
+            },
+            "expectedJson": {
+                "username": "bob",
+                "displayname": "Bob",
+                "role": "admin",
+                "weight": 72.4,
+                "areWorkoutsPublic": true
+            }
         },
         "ReplaceOneExistingNewKey": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": {
+                "username": "bob",
+                "displayname": "Bob",
+                "role": "default",
+                "weight": 75,
+                "areWorkoutsPublic": true
+            },
+            "expectedJson": {
+                "username": "bob",
+                "displayname": "Bob",
+                "role": "default",
+                "weight": 75,
+                "areWorkoutsPublic": true
+            }
         },
         "UpdateOneExisting": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": { "displayname": "frank69", "weight": 65.33 },
+            "expectedJson": {
+                "username": "frank",
+                "displayname": "frank69",
+                "role": "admin",
+                "weight": 65.33,
+                "areWorkoutsPublic": true
+            }
         },
         "UpdateOneExistingMinimumFields": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": { "username": "frank" },
+            "expectedJson": {
+                "username": "frank",
+                "displayname": "Frank",
+                "role": "admin",
+                "weight": 65.2,
+                "areWorkoutsPublic": true
+            }
         },
         "UpdateOneExistingNewKey": {
-            "inputJson": {},
-            "expectedJson": {},
-            "expectedDbRowState": {}
+            "inputJson": {
+                "username": "bob",
+                "displayname": "Bob",
+                "role": "default",
+                "weight": 75,
+                "areWorkoutsPublic": true
+            },
+            "expectedJson": {
+                "username": "bob",
+                "displayname": "Bob",
+                "role": "default",
+                "weight": 75,
+                "areWorkoutsPublic": true
+            }
         }
     }
 }

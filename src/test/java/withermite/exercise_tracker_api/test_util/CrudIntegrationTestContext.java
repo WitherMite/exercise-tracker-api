@@ -32,11 +32,10 @@ public class CrudIntegrationTestContext {
         // generate empty test cases
         ObjectNode testDataJson = blankConfig.putObject("testData");
         for (CaseType type : CaseType.values()) {
-            // create an object for each test case with three blank objects
+            // create an object for each test case with blank object fields
             ObjectNode testCase = testDataJson.putObject(type.toString());
             testCase.putObject("inputJson");
             testCase.putObject("expectedJson");
-            testCase.putObject("expectedDbRowState");
         }
         // write to file
         mapper.writerWithDefaultPrettyPrinter()
@@ -52,10 +51,7 @@ public class CrudIntegrationTestContext {
     ClassPathResource populateSql;
     CrudTestData testData;
 
-    // hard problem to solve for asserting db state is how to get the correct type
-    // for fields that are vague in json like numbers
-
-    public CrudIntegrationTestContext(FileSystemResource json) {
+    public CrudIntegrationTestContext(FileSystemResource json, Map<CaseType, Map<String, Object>> dbStateMap) {
         try (InputStream stream = json.getInputStream()) {
             // traverse the stream as a tree
             JsonNode node = mapper.readTree(stream);
@@ -87,12 +83,7 @@ public class CrudIntegrationTestContext {
                 return new DataGroup(
                         testCase.get("inputJson").toString(),
                         testCase.get("expectedJson").toString(),
-                        // unsure how to handle the vague json types for the expected db state map
-                        Map.of( // temp hardcoded for CreateOneUniqueMinimumFields
-                                "displayname", "Bob",
-                                "user_role", "default",
-                                "are_workouts_public", false,
-                                "weight", 65.2d));
+                        dbStateMap.get(key));
             });
 
         } catch (IOException e) {

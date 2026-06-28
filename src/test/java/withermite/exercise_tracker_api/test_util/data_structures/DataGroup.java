@@ -8,8 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class DataGroup {
-    public String inputJson;
-    public String expectedJson;
+    public final String inputJson;
+    public final String expectedJson;
     private final Map<String, Object> expectedDbRowState;
 
     public void assertDbState(ResultSet rs) {

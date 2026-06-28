@@ -92,47 +92,7 @@ public class CrudIntegrationTests {
         @Test
         public void getsManyFromDB() {
             // defaulting to a page size limit of 5 for now
-            // extract expected json into resource file in refactor
-            // to prevent thing like this
-            String expectedJson = """
-                        [
-                            {
-                                "username":"frank",
-                                "displayname":"Frank",
-                                "role": "admin",
-                                "weight": 65.2,
-                                "areWorkoutsPublic": true
-                            },
-                            {
-                                "username":"frank2",
-                                "displayname":"Frank",
-                                "role": "admin",
-                                "weight": 65.2,
-                                "areWorkoutsPublic": true
-                            },
-                            {
-                                "username":"frank3",
-                                "displayname":"Frank",
-                                "role": "admin",
-                                "weight": 65.2,
-                                "areWorkoutsPublic": true
-                            },
-                            {
-                                "username":"frank4",
-                                "displayname":"Frank",
-                                "role": "admin",
-                                "weight": 65.2,
-                                "areWorkoutsPublic": true
-                            },
-                            {
-                                "username":"frank5",
-                                "displayname":"Frank",
-                                "role": "admin",
-                                "weight": 65.2,
-                                "areWorkoutsPublic": true
-                            }
-                        ]
-                    """;
+            DataGroup data = testCases.get(CaseType.ReadFiveExisting);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -140,7 +100,7 @@ public class CrudIntegrationTests {
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(expectedJson));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -148,24 +108,7 @@ public class CrudIntegrationTests {
 
         @Test
         public void getsSpecifiedCountAndOffsetFromDB() {
-            String expectedJson = """
-                        [
-                            {
-                                "username":"frank3",
-                                "displayname":"Frank",
-                                "role": "admin",
-                                "weight": 65.2,
-                                "areWorkoutsPublic": true
-                            },
-                            {
-                                "username":"frank4",
-                                "displayname":"Frank",
-                                "role": "admin",
-                                "weight": 65.2,
-                                "areWorkoutsPublic": true
-                            }
-                        ]
-                    """;
+            DataGroup data = testCases.get(CaseType.ReadThirdAndFourthExisting);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -173,7 +116,7 @@ public class CrudIntegrationTests {
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(expectedJson));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -224,13 +167,13 @@ public class CrudIntegrationTests {
 
         @Test
         public void badRequestIfMissingFields() {
-            String json = "{\"username\": \"bob\"}";
+            DataGroup data = testCases.get(CaseType.FailNotEnoughFields);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange()
                     .expectStatus().isBadRequest()
                     .expectBody().isEmpty();
@@ -241,21 +184,13 @@ public class CrudIntegrationTests {
 
         @Test
         public void conflictIfKeyNotUnique() {
-            String json = """
-                        {
-                            "username":"frank",
-                            "displayname":"Frank",
-                            "role": "default",
-                            "weight": 70,
-                            "areWorkoutsPublic": true
-                        }
-                    """;
+            DataGroup data = testCases.get(CaseType.ReplaceOneExisting);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange()
                     .expectStatus().isEqualTo(409)
                     .expectBody().isEmpty();
@@ -269,24 +204,16 @@ public class CrudIntegrationTests {
     public class putTests {
         @Test
         public void putsToDB() {
-            String json = """
-                        {
-                            "username":"frank",
-                            "displayname":"Frank69",
-                            "role": "default",
-                            "weight": 75,
-                            "areWorkoutsPublic": true
-                        }
-                    """;
+            DataGroup data = testCases.get(CaseType.ReplaceOneExisting);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(json));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -302,30 +229,16 @@ public class CrudIntegrationTests {
 
         @Test
         public void ommitedOptionalFieldsSetDefaultValues() {
-            String json = """
-                        {
-                            "username":"frank",
-                            "displayname":"Frank"
-                        }
-                    """;
-            String expectedJson = """
-                        {
-                            "username":"frank",
-                            "displayname":"Frank",
-                            "role": "default",
-                            "weight": null,
-                            "areWorkoutsPublic": false
-                        }
-                    """;
+            DataGroup data = testCases.get(CaseType.ReplaceOneExistingMinumumFields);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(expectedJson));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -341,24 +254,16 @@ public class CrudIntegrationTests {
 
         @Test
         public void putCreatesNewResourceWhenNotInDB() {
-            String json = """
-                        {
-                            "username":"bob",
-                            "displayname":"Bob",
-                            "role": "admin",
-                            "weight": 72.4,
-                            "areWorkoutsPublic": true
-                        }
-                    """;
+            DataGroup data = testCases.get(CaseType.ReplaceOneUnique);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", newKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange().expectAll(
                             r -> r.expectStatus().isCreated(),
-                            r -> r.expectBody().json(json));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(1, rowsAfter - rowsBefore);
@@ -374,28 +279,19 @@ public class CrudIntegrationTests {
 
         @Test
         public void seeOtherStatusWhenKeyChanges() {
+            DataGroup data = testCases.get(CaseType.ReplaceOneExistingNewKey);
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(resourceUri + "/{key}").build(newKey);
-
-            String json = """
-                        {
-                            "username":"bob",
-                            "displayname":"Bob",
-                            "role": "default",
-                            "weight": 75,
-                            "areWorkoutsPublic": true
-                        }
-                    """;
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange().expectAll(
                             r -> r.expectStatus().isEqualTo(303)
                                     .expectHeader().location(location.toString()),
-                            r -> r.expectBody().json(json));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -413,13 +309,13 @@ public class CrudIntegrationTests {
 
         @Test
         public void badRequestIfMissingFields() {
-            String json = "{\"displayname\": \"frank69\"}";
+            DataGroup data = testCases.get(CaseType.FailNotEnoughFields);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange()
                     .expectStatus().isBadRequest()
                     .expectBody().isEmpty();
@@ -433,25 +329,16 @@ public class CrudIntegrationTests {
     public class PatchTests {
         @Test
         public void patchesInDB() {
-            String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";
-            String expectedJson = """
-                        {
-                            "username":"frank",
-                            "displayname":"frank69",
-                            "role": "admin",
-                            "weight": 65.33,
-                            "areWorkoutsPublic": true
-                        }
-                    """;
+            DataGroup data = testCases.get(CaseType.UpdateOneExisting);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.patch().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(expectedJson));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -467,25 +354,16 @@ public class CrudIntegrationTests {
 
         @Test
         public void doesntTouchOmmitedFields() {
-            String json = "{\"username\":\"frank\"}";
-            String expectedJson = """
-                        {
-                            "username":"frank",
-                            "displayname":"Frank",
-                            "role": "admin",
-                            "weight": 65.2,
-                            "areWorkoutsPublic": true
-                        }
-                    """;
+            DataGroup data = testCases.get(CaseType.UpdateOneExistingMinimumFields);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.patch().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(expectedJson));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -501,28 +379,19 @@ public class CrudIntegrationTests {
 
         @Test
         public void seeOtherStatusWhenKeyChanges() {
+            DataGroup data = testCases.get(CaseType.UpdateOneExistingNewKey);
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(resourceUri + "/{key}").build(newKey);
-
-            String json = """
-                        {
-                            "username":"bob",
-                            "displayname":"Bob",
-                            "role": "default",
-                            "weight": 75,
-                            "areWorkoutsPublic": true
-                        }
-                    """;
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange().expectAll(
                             r -> r.expectStatus().isEqualTo(303)
                                     .expectHeader().location(location.toString()),
-                            r -> r.expectBody().json(json));
+                            r -> r.expectBody().json(data.expectedJson));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -540,13 +409,13 @@ public class CrudIntegrationTests {
         // Error tests
         @Test
         public void notFoundIfNotInDB() {
-            String json = "{\"displayname\":\"frank69\", \"weight\": 65.33}";
+            DataGroup data = testCases.get(CaseType.FailUpdateNotExists);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.patch().uri(resourceUri + "/{key}", newKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(json)
+                    .body(data.inputJson)
                     .exchange()
                     .expectStatus().isNotFound()
                     .expectBody().isEmpty();
@@ -587,5 +456,4 @@ public class CrudIntegrationTests {
             assertEquals(rowsBefore, rowsAfter);
         }
     }
-
 }
