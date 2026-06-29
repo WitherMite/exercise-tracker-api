@@ -1,6 +1,5 @@
 package withermite.exercise_tracker_api.user;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -16,120 +15,46 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import withermite.exercise_tracker_api.util.ResourceWrapper;
+import withermite.exercise_tracker_api.util.crud_behaviors.CrudControllerBehavior;
 
 @RestController
 @RequestMapping("/users")
 class UsersController {
-    private final int defaultPageSize;
-    private final UsersService usersService;
+    private final String resourceUri = "/users";
+    private final CrudControllerBehavior<User, UsersService> crud;
 
     public UsersController(UsersService usersService, @Value("${user.defaultPageSize}") int defaultPageSize) {
-        this.usersService = usersService;
-        this.defaultPageSize = defaultPageSize;
+        this.crud = new CrudControllerBehavior<>(usersService, this.resourceUri, defaultPageSize);
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> many(@RequestParam Map<String, String> params) {
-        try {
-            int limit = params.containsKey("limit")
-                    ? Integer.parseInt(params.get("limit"))
-                    : defaultPageSize;
-            int offset = params.containsKey("offset")
-                    ? Integer.parseInt(params.get("offset"))
-                    : 0;
-
-            List<User> users = usersService.findMany(limit, offset);
-            return ResponseEntity.ok().body(users);
-
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<List<User>> getMany(@RequestParam Map<String, String> params) {
+        return crud.getMany(params);
     }
 
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user) {
-        ResourceWrapper<User> created = usersService.create(user);
-
-        if (created == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (created.problems != null) {
-            return ResponseEntity.status(409).build();
-        }
-
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{username}").buildAndExpand(user.username).toUri();
-
-        return ResponseEntity.created(location).body(created.resource);
+        return crud.create(user);
     }
 
     @GetMapping("/{key}")
-    public ResponseEntity<User> one(@PathVariable String key) {
-        User user = usersService.findOne(key);
-
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok().body(user);
+    public ResponseEntity<User> getOne(@PathVariable String key) {
+        return crud.getOne(key);
     }
 
     @PutMapping("/{key}")
     public ResponseEntity<User> replace(@PathVariable String key, @RequestBody User user) {
-        ResourceWrapper<User> replaced = usersService.replace(key, user);
-        User replacedUser = replaced.resource;
-
-        if (replacedUser == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/users/{username}").buildAndExpand(replacedUser.username).toUri();
-
-        if (replaced.wasCreated) {
-            return ResponseEntity.created(location).body(replacedUser);
-        }
-
-        if (!key.equals(replacedUser.username)) {
-            return ResponseEntity.status(303)
-                    .header("Location", location.toString())
-                    .body(replacedUser);
-        }
-
-        return ResponseEntity.ok().body(replacedUser);
+        return crud.replace(key, user);
     }
 
     @PatchMapping("/{key}")
     public ResponseEntity<User> update(@PathVariable String key, @RequestBody User user) {
-        User newUser = usersService.update(key, user);
-
-        if (newUser == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (!key.equals(newUser.username)) {
-            URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/users/{username}").buildAndExpand(newUser.username).toUri();
-
-            return ResponseEntity.status(303)
-                    .header("Location", location.toString())
-                    .body(newUser);
-        }
-
-        return ResponseEntity.ok().body(newUser);
+        return crud.update(key, user);
     }
 
     @DeleteMapping("/{key}")
     public ResponseEntity<Void> delete(@PathVariable String key) {
-        boolean deleted = usersService.delete(key);
-
-        if (!deleted) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.noContent().build();
+        return crud.delete(key);
     }
 }

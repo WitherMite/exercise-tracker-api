@@ -7,15 +7,17 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import withermite.exercise_tracker_api.util.ResourceWrapper;
+import withermite.exercise_tracker_api.util.crud_behaviors.CrudService;
 
 @Service
-public class UsersService {
+public class UsersService implements CrudService<User> {
     private final UsersRepository usersRepository;
 
     public UsersService(UsersRepository userRepository) {
         this.usersRepository = userRepository;
     }
 
+    @Override
     public ResourceWrapper<User> create(User user) {
         if (user.username == null || user.displayname == null) {
             return null;
@@ -34,14 +36,17 @@ public class UsersService {
         }
     }
 
+    @Override
     public User findOne(String username) {
         return usersRepository.one(username);
     }
 
+    @Override
     public List<User> findMany(int pageSize, int offset) {
         return usersRepository.many(pageSize, offset);
     }
 
+    @Override
     public ResourceWrapper<User> replace(String username, User user) {
         if (user.username == null || user.displayname == null) {
             return new ResourceWrapper<>(null);
@@ -49,10 +54,12 @@ public class UsersService {
         return usersRepository.replace(username, user);
     }
 
+    @Override
     public User update(String username, User user) {
         return usersRepository.update(username, user);
     }
 
+    @Override
     public boolean delete(String username) {
         return usersRepository.delete(username);
     }

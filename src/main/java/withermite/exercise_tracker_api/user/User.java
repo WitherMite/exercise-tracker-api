@@ -1,6 +1,8 @@
 package withermite.exercise_tracker_api.user;
 
-public class User {
+import withermite.exercise_tracker_api.util.crud_behaviors.Entity;
+
+public class User implements Entity {
     public String username;
     public String displayname;
     public Double weight;
@@ -13,5 +15,10 @@ public class User {
     }
 
     public User() {
+    }
+
+    @Override
+    public String getKey() {
+        return username;
     }
 }
