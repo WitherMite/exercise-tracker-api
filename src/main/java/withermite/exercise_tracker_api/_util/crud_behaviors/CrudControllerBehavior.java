@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.util.crud_behaviors;
+package withermite.exercise_tracker_api._util.crud_behaviors;
 
 import java.net.URI;
 import java.util.List;
@@ -7,9 +7,9 @@ import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import withermite.exercise_tracker_api.util.ResourceWrapper;
+import withermite.exercise_tracker_api._util.ResourceWrapper;
 
-public class CrudControllerBehavior<E extends Entity, S extends CrudService<E>> {
+public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E>> {
     private final S service;
     private final int defaultPageSize;
     private final String resourceUri;

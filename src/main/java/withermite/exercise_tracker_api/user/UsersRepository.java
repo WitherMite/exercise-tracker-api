@@ -8,8 +8,8 @@ import static org.jooq.generated.tables.AppUser.APP_USER;
 import org.jooq.generated.tables.records.AppUserRecord;
 import org.springframework.stereotype.Repository;
 
-import withermite.exercise_tracker_api.util.ResourceWrapper;
-import withermite.exercise_tracker_api.util.crud_behaviors.CrudRepositoryBehavior;
+import withermite.exercise_tracker_api._util.ResourceWrapper;
+import withermite.exercise_tracker_api._util.crud_behaviors.CrudRepositoryBehavior;
 
 @Repository
 public class UsersRepository {

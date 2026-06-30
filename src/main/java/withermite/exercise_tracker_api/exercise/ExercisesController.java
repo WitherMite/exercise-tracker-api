@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/exercises")
+@RequestMapping("/exercise-types/{name}/exercises")
 class ExercisesController {
-    
+
     @GetMapping
     public String many() {
         return "many";

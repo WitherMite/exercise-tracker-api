@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/exercise-types")
 class ExerciseTypesController {
-    
+
     @GetMapping
     public String many() {
         return "many";
@@ -23,17 +23,17 @@ class ExerciseTypesController {
     }
 
     @GetMapping("/{key}")
-    public String one(@PathVariable Long key) {
+    public String one(@PathVariable String key) {
         return "" + key;
     }
 
     @PutMapping("/{key}")
-    public String update(@PathVariable Long key) {
+    public String update(@PathVariable String key) {
         return "update" + key;
     }
 
     @DeleteMapping("/{key}")
-    public String delete(@PathVariable Long key) {
+    public String delete(@PathVariable String key) {
         return "delete" + key;
     }
 }

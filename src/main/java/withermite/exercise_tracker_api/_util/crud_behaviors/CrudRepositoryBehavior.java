@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.util.crud_behaviors;
+package withermite.exercise_tracker_api._util.crud_behaviors;
 
 import java.util.List;
 
@@ -8,18 +8,18 @@ import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
 import org.jooq.exception.DataAccessException;
 
-import withermite.exercise_tracker_api.util.EntityMerger;
-import withermite.exercise_tracker_api.util.ResourceWrapper;
+import withermite.exercise_tracker_api._util.EntityMerger;
+import withermite.exercise_tracker_api._util.ResourceWrapper;
 
-public class CrudRepositoryBehavior<E extends Entity, R extends UpdatableRecord<R>, KeyType> {
+public class CrudRepositoryBehavior<E extends Entity<T>, R extends UpdatableRecord<R>, T> {
     private final DSLContext create;
     private final Class<E> entityType;
     private final Table<R> table;
-    private final TableField<R, KeyType> tableKey;
+    private final TableField<R, T> tableKey;
     private final EntityMerger<E, R> unmapper;
 
     public CrudRepositoryBehavior(
-            DSLContext dslContext, Table<R> table, TableField<R, KeyType> tableKey,
+            DSLContext dslContext, Table<R> table, TableField<R, T> tableKey,
             Class<E> entityType, EntityMerger<E, R> unmapper) {
 
         this.create = dslContext;
@@ -35,7 +35,7 @@ public class CrudRepositoryBehavior<E extends Entity, R extends UpdatableRecord<
         return record.into(entityType);
     }
 
-    public E getOne(KeyType key) {
+    public E getOne(T key) {
         R record = create.fetchOne(
                 table, tableKey.eq(key));
 
@@ -50,7 +50,7 @@ public class CrudRepositoryBehavior<E extends Entity, R extends UpdatableRecord<
         return entities;
     }
 
-    public E update(KeyType key, E entity) {
+    public E update(T key, E entity) {
         try {
             R record = create.fetchOne(
                     table, tableKey.eq(key));
@@ -68,7 +68,7 @@ public class CrudRepositoryBehavior<E extends Entity, R extends UpdatableRecord<
         }
     }
 
-    public ResourceWrapper<E> replace(KeyType key, E entity) {
+    public ResourceWrapper<E> replace(T key, E entity) {
         try {
             // try to get from db
             R record = create.fetchOne(
@@ -89,7 +89,7 @@ public class CrudRepositoryBehavior<E extends Entity, R extends UpdatableRecord<
         }
     }
 
-    public boolean delete(KeyType key) {
+    public boolean delete(T key) {
         R record = create.fetchOne(
                 table, tableKey.eq(key));
 

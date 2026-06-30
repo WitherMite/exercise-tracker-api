@@ -1,10 +1,10 @@
-package withermite.exercise_tracker_api.util.crud_behaviors;
+package withermite.exercise_tracker_api._util.crud_behaviors;
 
 import java.util.List;
 
-import withermite.exercise_tracker_api.util.ResourceWrapper;
+import withermite.exercise_tracker_api._util.ResourceWrapper;
 
-public interface CrudService<E extends Entity> {
+public interface CrudService<E extends Entity<?>> {
     public ResourceWrapper<E> create(E entity);
 
     public E findOne(String key);

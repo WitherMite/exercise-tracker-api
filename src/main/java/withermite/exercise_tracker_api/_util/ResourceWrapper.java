@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.util;
+package withermite.exercise_tracker_api._util;
 
 import java.util.List;
 

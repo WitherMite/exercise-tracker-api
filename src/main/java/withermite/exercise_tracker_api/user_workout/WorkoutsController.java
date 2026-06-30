@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.user_exercise;
+package withermite.exercise_tracker_api.user_workout;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user-exercises")
-class UserExercisesController {
-    
+@RequestMapping("/users/{username}/workouts")
+class WorkoutsController {
+
     @GetMapping
     public String many() {
         return "many";

@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import withermite.exercise_tracker_api.util.ResourceWrapper;
-import withermite.exercise_tracker_api.util.crud_behaviors.CrudService;
+import withermite.exercise_tracker_api._util.ResourceWrapper;
+import withermite.exercise_tracker_api._util.crud_behaviors.CrudService;
 
 @Service
 public class UsersService implements CrudService<User> {

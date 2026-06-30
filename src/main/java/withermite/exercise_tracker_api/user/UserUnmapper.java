@@ -5,7 +5,7 @@ import org.jooq.exception.MappingException;
 import org.jooq.generated.enums.UserRoleEnum;
 import org.jooq.generated.tables.records.AppUserRecord;
 
-import withermite.exercise_tracker_api.util.EntityMerger;
+import withermite.exercise_tracker_api._util.EntityMerger;
 
 public class UserUnmapper implements EntityMerger<User, AppUserRecord>, RecordUnmapper<User, AppUserRecord> {
     @Override

@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 
-import withermite.exercise_tracker_api.util.ResourceWrapper;
+import withermite.exercise_tracker_api._util.ResourceWrapper;
 
 public class UsersServiceTests {
     private AutoCloseable mocks;
@@ -42,18 +42,20 @@ public class UsersServiceTests {
     // Crud tests
     @Test
     public void savesUserInRepository() {
-        User testUser = new User("frank", "Frank");
+        User user = new User();
+        user.username = "frank";
+        user.displayname = "Frank";
 
-        usersService.create(testUser);
+        usersService.create(user);
 
-        verify(usersRepository, times(1)).save(testUser);
+        verify(usersRepository, times(1)).save(user);
     }
 
     @Test
     public void getsUserFromRepository() {
         String username = "frank";
-        String displayname = "Frank";
-        User user = new User(username, displayname);
+        User user = new User();
+        user.username = username;
         when(usersRepository.getOne(anyString())).thenReturn(user);
 
         User foundUser = usersService.findOne(username);
@@ -74,9 +76,11 @@ public class UsersServiceTests {
     public void replacesUserInRepository() {
         String username = "frank";
         String displayname = "Frank";
-        User user = new User(username, displayname);
+        User user = new User();
+        user.username = username;
+        user.displayname = displayname;
         // different return user to make sure we return from repository
-        User user2 = new User("bob", "Bob");
+        User user2 = new User();
         when(usersRepository.replace(anyString(), eq(user))).thenReturn(new ResourceWrapper<>(user2));
 
         User changedUser = usersService.replace(username, user).resource;
@@ -89,9 +93,11 @@ public class UsersServiceTests {
     public void updatesUserInRepository() {
         String username = "frank";
         String displayname = "Frank";
-        User user = new User(username, displayname);
+        User user = new User();
+        user.username = username;
+        user.displayname = displayname;
         // different return user to make sure we return from repository
-        User user2 = new User("bob", "Bob");
+        User user2 = new User();
         when(usersRepository.update(anyString(), eq(user))).thenReturn(user2);
 
         User changedUser = usersService.update(username, user);
@@ -114,7 +120,8 @@ public class UsersServiceTests {
     @Test
     public void createShouldNotAllowIncompleteUsers() {
         String username = "frank";
-        User user = new User(username, null);
+        User user = new User();
+        user.username = username;
 
         ResourceWrapper<User> result = usersService.create(user);
 
@@ -125,7 +132,8 @@ public class UsersServiceTests {
     @Test
     public void replaceShouldNotAllowIncompleteUsers() {
         String username = "frank";
-        User user = new User(username, null);
+        User user = new User();
+        user.username = username;
 
         User changedUser = usersService.replace(username, user).resource;
 
