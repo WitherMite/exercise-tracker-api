@@ -8,15 +8,18 @@ import static org.jooq.generated.tables.AppUser.APP_USER;
 import org.jooq.generated.tables.records.AppUserRecord;
 import org.springframework.stereotype.Repository;
 
-import static withermite.exercise_tracker_api.user.UserUnmapper.unmapDiff;
 import withermite.exercise_tracker_api.util.ResourceWrapper;
+import withermite.exercise_tracker_api.util.crud_behaviors.CrudRepositoryBehavior;
 
 @Repository
 public class UsersRepository {
     private final DSLContext create;
+    private final CrudRepositoryBehavior<User, AppUserRecord, String> crud;
 
     public UsersRepository(DSLContext dslContext) {
         this.create = dslContext;
+        this.crud = new CrudRepositoryBehavior<>(
+                dslContext, APP_USER, APP_USER.USERNAME, User.class, new UserUnmapper());
     }
 
     public User save(User user) {
@@ -27,40 +30,20 @@ public class UsersRepository {
         return userRecord.into(User.class);
     }
 
-    public User one(String username) {
-        AppUserRecord userRecord = create.fetchOne(
-                APP_USER, APP_USER.USERNAME.eq(username));
-
-        if (userRecord != null) {
-            return userRecord.into(User.class);
-        }
-        return null;
+    public User getOne(String username) {
+        return crud.getOne(username);
     }
 
-    public List<User> many(int pageSize, int offset) {
-        List<User> users = create.selectFrom(APP_USER).limit(pageSize).offset(offset).fetchInto(User.class);
-        return users;
+    public List<User> getMany(int pageSize, int offset) {
+        return crud.getMany(pageSize, offset);
     }
 
     public User update(String username, User user) {
-        try {
-            AppUserRecord userRecord = create.fetchOne(
-                    APP_USER, APP_USER.USERNAME.eq(username));
-
-            if (userRecord != null) {
-                unmapDiff(user, userRecord);
-                userRecord.update();
-                return userRecord.into(User.class);
-            }
-            return null;
-
-        } catch (DataAccessException e) {
-            System.err.println(e.getMessage());
-            return null;
-        }
+        return crud.update(username, user);
     }
 
     public ResourceWrapper<User> replace(String username, User user) {
+        // leave until security is implemented, has call to save, and needs pw_hash set
         try {
             // try to get user from db
             AppUserRecord userRecord = create.fetchOne(
@@ -82,13 +65,6 @@ public class UsersRepository {
     }
 
     public boolean delete(String username) {
-        AppUserRecord userRecord = create.fetchOne(
-                APP_USER, APP_USER.USERNAME.eq(username));
-
-        if (userRecord == null) {
-            return false;
-        }
-        userRecord.delete();
-        return true;
+        return crud.delete(username);
     }
 }

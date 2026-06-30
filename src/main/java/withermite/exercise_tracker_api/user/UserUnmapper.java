@@ -5,8 +5,11 @@ import org.jooq.exception.MappingException;
 import org.jooq.generated.enums.UserRoleEnum;
 import org.jooq.generated.tables.records.AppUserRecord;
 
-public class UserUnmapper implements RecordUnmapper<User, AppUserRecord> {
-    public static void unmapDiff(User user, AppUserRecord record) {
+import withermite.exercise_tracker_api.util.EntityMerger;
+
+public class UserUnmapper implements EntityMerger<User, AppUserRecord>, RecordUnmapper<User, AppUserRecord> {
+    @Override
+    public void unmapDiff(User user, AppUserRecord record) {
         if (record == null)
             return;
 

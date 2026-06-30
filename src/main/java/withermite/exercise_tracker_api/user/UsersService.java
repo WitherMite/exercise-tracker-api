@@ -38,12 +38,12 @@ public class UsersService implements CrudService<User> {
 
     @Override
     public User findOne(String username) {
-        return usersRepository.one(username);
+        return usersRepository.getOne(username);
     }
 
     @Override
     public List<User> findMany(int pageSize, int offset) {
-        return usersRepository.many(pageSize, offset);
+        return usersRepository.getMany(pageSize, offset);
     }
 
     @Override

@@ -54,7 +54,7 @@ public class UsersServiceTests {
         String username = "frank";
         String displayname = "Frank";
         User user = new User(username, displayname);
-        when(usersRepository.one(anyString())).thenReturn(user);
+        when(usersRepository.getOne(anyString())).thenReturn(user);
 
         User foundUser = usersService.findOne(username);
 
@@ -67,7 +67,7 @@ public class UsersServiceTests {
 
         usersService.findMany(5, 0);
 
-        verify(usersRepository, times(1)).many(5, 0);
+        verify(usersRepository, times(1)).getMany(5, 0);
     }
 
     @Test
