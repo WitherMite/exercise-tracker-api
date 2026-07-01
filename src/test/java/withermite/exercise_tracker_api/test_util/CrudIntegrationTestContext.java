@@ -64,14 +64,14 @@ public class CrudIntegrationTestContext {
         };
     }
 
-    String testName;
-    String resourceUri;
-    String tableName;
-    String keyRowName;
-    String existingKey;
-    String newKey;
-    ClassPathResource populateSql;
-    CrudTestData testData;
+    public String testName;
+    public String resourceUri;
+    public String tableName;
+    public String keyRowName;
+    public String existingKey;
+    public String newKey;
+    public ClassPathResource populateSql;
+    public CrudTestData testData;
 
     public CrudIntegrationTestContext(FileSystemResource json, Map<String, DBRowType> jsonPropToDbRowMap) {
         try (InputStream stream = json.getInputStream()) {

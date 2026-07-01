@@ -24,7 +24,6 @@ import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import withermite.exercise_tracker_api.test_util.CrudIntegrationTestContextProvider;
 import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData.CaseType;
 import withermite.exercise_tracker_api.test_util.data_structures.DataGroup;
 

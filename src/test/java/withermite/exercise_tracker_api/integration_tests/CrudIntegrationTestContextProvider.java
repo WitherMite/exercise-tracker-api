@@ -1,4 +1,4 @@
-package withermite.exercise_tracker_api.test_util;
+package withermite.exercise_tracker_api.integration_tests;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -10,13 +10,16 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import org.springframework.core.io.FileSystemResource;
 
-import withermite.exercise_tracker_api.integration_tests.CrudIntegrationTests;
+import withermite.exercise_tracker_api.exercise_type.ExerciseTypeCrudTestsConfig;
+import withermite.exercise_tracker_api.test_util.CrudIntegrationTestContext;
+import withermite.exercise_tracker_api.test_util.CrudIntegrationTestsConfig;
 import withermite.exercise_tracker_api.user.UserCrudTestsConfig;
 
 public class CrudIntegrationTestContextProvider implements ClassTemplateInvocationContextProvider {
     // list config sources here
     private final CrudIntegrationTestsConfig[] configSources = {
-            new UserCrudTestsConfig()
+            new UserCrudTestsConfig(),
+            new ExerciseTypeCrudTestsConfig()
     };
     private final String filePrefix = "src/test/resources/";
     private final CrudIntegrationTestContext[] configs;

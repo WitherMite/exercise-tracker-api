@@ -1,5 +1,5 @@
 {
-    "testName": "User CRUD Integration Tests",
+    "testName": "User Tests",
     "resourceUri": "/users",
     "tableName": "app_user",
     "keyRowName": "username",
