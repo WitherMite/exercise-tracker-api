@@ -1,0 +1,113 @@
+{
+    "testName": "Exercise Type Tests",
+    "resourceUri": "/exercise-types",
+    "populateSqlPath": "testsql/exercise_type/populate-exercise-type.sql",
+    "dbTableName": "exercise_type",
+    "dbKeyRowName": "exercise_type_name",
+    "testData": {
+        "RequiredFields": ["name", "countType", "workTimeType", "loadType"],
+        "EntityExisting": {
+            "keyValue": "Distance run",
+            "fullOriginal": {
+                "name": "Distance run",
+                "countType": "single",
+                "workTimeType": "time",
+                "loadType": "distance",
+                "restType": "optional"
+            },
+            "alternateValues": {
+                "name": "Distance run",
+                "countType": "lap",
+                "workTimeType": "time",
+                "loadType": "distance",
+                "restType": "afterCount"
+            },
+            "dbStateOriginal": {
+                "id": 1,
+                "exercise_type_name": "Distance run",
+                "count_type": "single",
+                "work_time_type": "time",
+                "load_type": "distance",
+                "rest_type": "optional"
+            },
+            "dbStateAlternate": {
+                "id": 1,
+                "exercise_type_name": "Distance run",
+                "count_type": "lap",
+                "work_time_type": "time",
+                "load_type": "distance",
+                "rest_type": "afterCount"
+            }
+        },
+        "EntityUnique": {
+            "keyValue": "Weightlifting",
+            "fullOriginal": {
+                "name": "Weightlifting",
+                "countType": "set",
+                "workTimeType": "repetition",
+                "loadType": "weight",
+                "restType": "optional"
+            },
+            "alternateValues": {
+                "name": "Weightlifting",
+                "countType": "single",
+                "workTimeType": "repetition",
+                "loadType": "weight",
+                "restType": "afterCount"
+            },
+            "dbStateOriginal": {
+                "id": 6,
+                "exercise_type_name": "Weightlifting",
+                "count_type": "set",
+                "work_time_type": "repetition",
+                "load_type": "weight",
+                "rest_type": "optional"
+            },
+            "dbStateAlternate": {
+                "id": 6,
+                "exercise_type_name": "Weightlifting",
+                "count_type": "single",
+                "work_time_type": "repetition",
+                "load_type": "weight",
+                "rest_type": "afterCount"
+            }
+        },
+        "DefaultFullPageResponse": [
+            {
+                "name": "Distance run",
+                "countType": "single",
+                "workTimeType": "time",
+                "loadType": "distance",
+                "restType": "optional"
+            },
+            {
+                "name": "Distance run 2",
+                "countType": "single",
+                "workTimeType": "time",
+                "loadType": "distance",
+                "restType": "optional"
+            },
+            {
+                "name": "Distance run 3",
+                "countType": "single",
+                "workTimeType": "time",
+                "loadType": "distance",
+                "restType": "optional"
+            },
+            {
+                "name": "Distance run 4",
+                "countType": "single",
+                "workTimeType": "time",
+                "loadType": "distance",
+                "restType": "optional"
+            },
+            {
+                "name": "Distance run 5",
+                "countType": "single",
+                "workTimeType": "time",
+                "loadType": "distance",
+                "restType": "optional"
+            }
+        ]
+    }
+}

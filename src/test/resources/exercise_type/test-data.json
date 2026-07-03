@@ -16,8 +16,8 @@
         },
         "FailUpdateNotExists": {
             "inputJson": {
-                "name": "Bodyweight",
-                "countType": "single"
+                "name": "Weightlifting",
+                "countType": "set"
             },
             "expectedJson": {}
         },
