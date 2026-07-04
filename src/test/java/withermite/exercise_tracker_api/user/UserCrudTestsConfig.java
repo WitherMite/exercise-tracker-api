@@ -11,17 +11,13 @@ public class UserCrudTestsConfig implements CrudIntegrationTestsConfig {
     }
 
     @Override
-    public Map<String, DBRowType> getJsonPropToDbRowMap() {
+    public Map<String, Class<?>> getDbRowMapToTypeMap() {
         return Map.of(
-                "username",
-                new DBRowType("username", String.class),
-                "displayname",
-                new DBRowType("displayname", String.class),
-                "role",
-                new DBRowType("user_role", String.class),
-                "areWorkoutsPublic",
-                new DBRowType("are_workouts_public", Boolean.class),
-                "weight",
-                new DBRowType("weight", Double.class));
+                "id", Integer.class,
+                "username", String.class,
+                "displayname", String.class,
+                "user_role", String.class,
+                "are_workouts_public", Boolean.class,
+                "weight", Double.class);
     }
 }

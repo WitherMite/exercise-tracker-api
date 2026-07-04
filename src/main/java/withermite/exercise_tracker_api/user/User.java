@@ -10,7 +10,7 @@ public class User implements Entity<String> {
     public Boolean areWorkoutsPublic;
 
     @Override
-    public String getKey() {
+    public String fetchKeyValue() {
         return username;
     }
 }

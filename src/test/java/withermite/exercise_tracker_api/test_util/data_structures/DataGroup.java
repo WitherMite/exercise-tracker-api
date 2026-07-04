@@ -8,15 +8,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class DataGroup {
-    public final String inputJson;
-    public final String expectedJson;
-    private final Map<String, ExpectedObject> expectedDbRowState;
-
     public record ExpectedObject(Object value, Class<?> type) {
     };
 
+    private final Map<String, ExpectedObject> expectedDbRowState;
+
+    public final String json;
+
+    public DataGroup(String json, Map<String, ExpectedObject> expectedDbRowState) {
+        this.json = json;
+        this.expectedDbRowState = expectedDbRowState;
+    }
+
     public void assertDbState(ResultSet rs) {
-        if (expectedDbRowState.isEmpty()) {
+        if (expectedDbRowState == null || expectedDbRowState.isEmpty()) {
             fail("no expected database state to assert");
         }
 
@@ -27,29 +32,5 @@ public class DataGroup {
                 fail(e);
             }
         });
-    }
-
-    public DataGroup(String inputJson, String expectedJson, Map<String, ExpectedObject> expectedDbRowState) {
-        this.inputJson = inputJson;
-        this.expectedJson = expectedJson;
-        this.expectedDbRowState = expectedDbRowState;
-    }
-
-    public DataGroup(String inputJson, String expectedJson) {
-        this.inputJson = inputJson;
-        this.expectedJson = expectedJson;
-        this.expectedDbRowState = Map.of();
-    }
-
-    public DataGroup(String expectedJson) {
-        this.inputJson = null;
-        this.expectedJson = expectedJson;
-        this.expectedDbRowState = Map.of();
-    }
-
-    protected DataGroup() {
-        this.inputJson = null;
-        this.expectedJson = null;
-        this.expectedDbRowState = Map.of();
     }
 }

@@ -1,199 +1,128 @@
 {
     "testName": "User Tests",
     "resourceUri": "/users",
-    "tableName": "app_user",
-    "keyRowName": "username",
-    "existingKey": "frank",
-    "newKey": "bob",
     "populateSqlPath": "testsql/user/populate-app-user.sql",
+    "dbTableName": "app_user",
+    "dbKeyRowName": "username",
     "testData": {
-        "FailNotEnoughFields": {
-            "inputJson": { "username": "bob" },
-            "expectedJson": {}
+        "optionalFields": ["role", "weight", "areWorkoutsPublic"],
+        "dbRowToFieldMapping": {
+            "username": "username",
+            "displayname": "displayname",
+            "user_role": "role",
+            "weight": "weight",
+            "are_workouts_public": "areWorkoutsPublic"
         },
-        "FailUpdateNotExists": {
-            "inputJson": { "displayname": "frank69", "weight": 65.33 },
-            "expectedJson": {}
-        },
-        "ReadOneExisting": {
-            "inputJson": {},
-            "expectedJson": {
-                "username": "frank",
-                "displayname": "Frank",
-                "role": "admin",
-                "weight": 65.2,
-                "areWorkoutsPublic": true
-            }
-        },
-        "ReadFiveExisting": {
-            "inputJson": {},
-            "expectedJson": [
-                {
-                    "username": "frank",
-                    "displayname": "Frank",
-                    "role": "admin",
-                    "weight": 65.2,
-                    "areWorkoutsPublic": true
-                },
-                {
-                    "username": "frank2",
-                    "displayname": "Frank",
-                    "role": "admin",
-                    "weight": 65.2,
-                    "areWorkoutsPublic": true
-                },
-                {
-                    "username": "frank3",
-                    "displayname": "Frank",
-                    "role": "admin",
-                    "weight": 65.2,
-                    "areWorkoutsPublic": true
-                },
-                {
-                    "username": "frank4",
-                    "displayname": "Frank",
-                    "role": "admin",
-                    "weight": 65.2,
-                    "areWorkoutsPublic": true
-                },
-                {
-                    "username": "frank5",
-                    "displayname": "Frank",
-                    "role": "admin",
-                    "weight": 65.2,
-                    "areWorkoutsPublic": true
-                }
-            ]
-        },
-        "ReadThirdAndFourthExisting": {
-            "inputJson": {},
-            "expectedJson": [
-                {
-                    "username": "frank3",
-                    "displayname": "Frank",
-                    "role": "admin",
-                    "weight": 65.2,
-                    "areWorkoutsPublic": true
-                },
-                {
-                    "username": "frank4",
-                    "displayname": "Frank",
-                    "role": "admin",
-                    "weight": 65.2,
-                    "areWorkoutsPublic": true
-                }
-            ]
-        },
-        "CreateOneUniqueMinimumFields": {
-            "inputJson": {
-                "username": "bob",
-                "displayname": "Bob",
-                "weight": 65.2
-            },
-            "expectedJson": {
-                "username": "bob",
-                "displayname": "Bob",
-                "role": "default",
-                "weight": 65.2,
-                "areWorkoutsPublic": false
-            }
-        },
-        "ReplaceOneExisting": {
-            "inputJson": {
-                "username": "frank",
-                "displayname": "Frank69",
-                "role": "default",
-                "weight": 75,
-                "areWorkoutsPublic": true
-            },
-            "expectedJson": {
-                "username": "frank",
-                "displayname": "Frank69",
-                "role": "default",
-                "weight": 75,
-                "areWorkoutsPublic": true
-            }
-        },
-        "ReplaceOneExistingMinumumFields": {
-            "inputJson": {
-                "username": "frank",
-                "displayname": "Frank"
-            },
-            "expectedJson": {
-                "username": "frank",
-                "displayname": "Frank",
+        "defaultValues": {
+            "entity": {
                 "role": "default",
                 "weight": null,
                 "areWorkoutsPublic": false
-            }
-        },
-        "ReplaceOneUnique": {
-            "inputJson": {
-                "username": "bob",
-                "displayname": "Bob",
-                "role": "admin",
-                "weight": 72.4,
-                "areWorkoutsPublic": true
             },
-            "expectedJson": {
-                "username": "bob",
-                "displayname": "Bob",
-                "role": "admin",
-                "weight": 72.4,
-                "areWorkoutsPublic": true
+            "database": {
+                "user_role": "default",
+                "weight": null,
+                "are_workouts_public": false
             }
         },
-        "ReplaceOneExistingNewKey": {
-            "inputJson": {
-                "username": "bob",
-                "displayname": "Bob",
-                "role": "default",
-                "weight": 75,
-                "areWorkoutsPublic": true
-            },
-            "expectedJson": {
-                "username": "bob",
-                "displayname": "Bob",
-                "role": "default",
-                "weight": 75,
-                "areWorkoutsPublic": true
-            }
-        },
-        "UpdateOneExisting": {
-            "inputJson": { "displayname": "frank69", "weight": 65.33 },
-            "expectedJson": {
-                "username": "frank",
-                "displayname": "frank69",
-                "role": "admin",
-                "weight": 65.33,
-                "areWorkoutsPublic": true
-            }
-        },
-        "UpdateOneExistingMinimumFields": {
-            "inputJson": { "username": "frank" },
-            "expectedJson": {
+        "entityExisting": {
+            "keyValue": "frank",
+            "original": {
                 "username": "frank",
                 "displayname": "Frank",
                 "role": "admin",
                 "weight": 65.2,
                 "areWorkoutsPublic": true
+            },
+            "alternateValues": {
+                "username": "frank",
+                "displayname": "Frank69",
+                "role": "default",
+                "weight": 75,
+                "areWorkoutsPublic": true
+            },
+            "dbStateOriginal": {
+                "username": "frank",
+                "displayname": "Frank",
+                "user_role": "admin",
+                "weight": 65.2,
+                "are_workouts_public": true
+            },
+            "dbStateAlternate": {
+                "username": "frank",
+                "displayname": "Frank69",
+                "user_role": "default",
+                "weight": 75,
+                "are_workouts_public": true
             }
         },
-        "UpdateOneExistingNewKey": {
-            "inputJson": {
+        "entityUnique": {
+            "keyValue": "bob",
+            "original": {
+                "username": "bob",
+                "displayname": "Bob",
+                "role": "admin",
+                "weight": 72.4,
+                "areWorkoutsPublic": true
+            },
+            "alternateValues": {
                 "username": "bob",
                 "displayname": "Bob",
                 "role": "default",
                 "weight": 75,
                 "areWorkoutsPublic": true
             },
-            "expectedJson": {
+            "dbStateOriginal": {
                 "username": "bob",
                 "displayname": "Bob",
-                "role": "default",
+                "user_role": "admin",
+                "weight": 72.4,
+                "are_workouts_public": true
+            },
+            "dbStateAlternate": {
+                "username": "bob",
+                "displayname": "Bob",
+                "user_role": "default",
                 "weight": 75,
+                "are_workouts_public": true
+            }
+        },
+        "defaultFullPageResponse": [
+            {
+                "username": "frank",
+                "displayname": "Frank",
+                "role": "admin",
+                "weight": 65.2,
+                "areWorkoutsPublic": true
+            },
+            {
+                "username": "frank2",
+                "displayname": "Frank",
+                "role": "admin",
+                "weight": 65.2,
+                "areWorkoutsPublic": true
+            },
+            {
+                "username": "frank3",
+                "displayname": "Frank",
+                "role": "admin",
+                "weight": 65.2,
+                "areWorkoutsPublic": true
+            },
+            {
+                "username": "frank4",
+                "displayname": "Frank",
+                "role": "admin",
+                "weight": 65.2,
+                "areWorkoutsPublic": true
+            },
+            {
+                "username": "frank5",
+                "displayname": "Frank",
+                "role": "admin",
+                "weight": 65.2,
                 "areWorkoutsPublic": true
             }
-        }
+        ]
     }
 }

@@ -10,7 +10,7 @@ public class ExerciseType implements Entity<String> {
     public String restType;
 
     @Override
-    public String getKey() {
+    public String fetchKeyValue() {
         return name;
     }
 

@@ -1,7 +1,6 @@
 package withermite.exercise_tracker_api.integration_tests;
 
 import java.net.URI;
-import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -24,7 +23,8 @@ import static org.springframework.test.jdbc.JdbcTestUtils.countRowsInTable;
 import org.springframework.test.web.servlet.client.RestTestClient;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData.CaseType;
+import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData;
+import withermite.exercise_tracker_api.test_util.data_structures.CrudTestData.JsonShape;
 import withermite.exercise_tracker_api.test_util.data_structures.DataGroup;
 
 @ClassTemplate
@@ -34,6 +34,8 @@ import withermite.exercise_tracker_api.test_util.data_structures.DataGroup;
 @Sql("/db/seed-schema.sql")
 @Sql(scripts = "/testsql/clean.sql", executionPhase = AFTER_TEST_CLASS)
 public class CrudIntegrationTests {
+    // tests assume database was empty, except for the populate script,
+    // and resources have a sequential id field, even if is hidden from api
 
     @Autowired
     private RestTestClient rest;
@@ -46,19 +48,19 @@ public class CrudIntegrationTests {
 
     private final ResourceDatabasePopulator populator = new ResourceDatabasePopulator();
     public ClassPathResource populateSql;
-    public Map<CaseType, DataGroup> testCases;
+    public CrudTestData testData;
     public String resourceUri;
     public String tableName;
     public String keyRowName;
     public String existingKey;
-    public String newKey;
+    public String uniqueKey;
 
     private String sqlSelectExisting() {
         return "SELECT * FROM " + tableName + " WHERE " + keyRowName + " = '" + existingKey + "'";
     }
 
     private String sqlSelectNew() {
-        return "SELECT * FROM " + tableName + " WHERE " + keyRowName + " = '" + newKey + "'";
+        return "SELECT * FROM " + tableName + " WHERE " + keyRowName + " = '" + uniqueKey + "'";
     }
 
     @BeforeEach
@@ -72,7 +74,7 @@ public class CrudIntegrationTests {
     public class GetTests {
         @Test
         public void getsFromDB() {
-            DataGroup data = testCases.get(CaseType.ReadOneExisting);
+            DataGroup data = testData.existingEntities.get(JsonShape.Full);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -80,7 +82,7 @@ public class CrudIntegrationTests {
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(data.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -90,8 +92,7 @@ public class CrudIntegrationTests {
 
         @Test
         public void getsManyFromDB() {
-            // defaulting to a page size limit of 5 for now
-            DataGroup data = testCases.get(CaseType.ReadFiveExisting);
+            String json = testData.fullPageExistingDefaultJson;
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -99,7 +100,7 @@ public class CrudIntegrationTests {
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -107,7 +108,7 @@ public class CrudIntegrationTests {
 
         @Test
         public void getsSpecifiedCountAndOffsetFromDB() {
-            DataGroup data = testCases.get(CaseType.ReadThirdAndFourthExisting);
+            String json = testData.thirdAndFourthExistingJson;
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
@@ -115,7 +116,7 @@ public class CrudIntegrationTests {
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -128,7 +129,7 @@ public class CrudIntegrationTests {
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.get().uri(resourceUri + "/{key}", newKey)
+            rest.get().uri(resourceUri + "/{key}", uniqueKey)
                     .exchange()
                     .expectStatus().isNotFound()
                     .expectBody().isEmpty();
@@ -142,23 +143,25 @@ public class CrudIntegrationTests {
     public class PostTests {
         @Test
         public void postsToDB() {
-            DataGroup data = testCases.get(CaseType.CreateOneUniqueMinimumFields);
+            DataGroup request = testData.uniqueEntities.get(JsonShape.MinimumFields);
+            DataGroup expected = testData.uniqueEntities.get(JsonShape.MinimumFieldsWithDefaults);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(request.json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isCreated(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(expected.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(1, rowsAfter - rowsBefore);
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
-                        data.assertDbState(rs);
+                        assertEquals(rowsBefore + 1, rs.getInt("id"));
+                        expected.assertDbState(rs);
                     });
         }
 
@@ -166,13 +169,13 @@ public class CrudIntegrationTests {
 
         @Test
         public void badRequestIfMissingFields() {
-            DataGroup data = testCases.get(CaseType.FailNotEnoughFields);
+            DataGroup data = testData.existingEntities.get(JsonShape.NotEnoughFields);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange()
                     .expectStatus().isBadRequest()
                     .expectBody().isEmpty();
@@ -183,13 +186,13 @@ public class CrudIntegrationTests {
 
         @Test
         public void conflictIfKeyNotUnique() {
-            DataGroup data = testCases.get(CaseType.ReplaceOneExisting);
+            DataGroup data = testData.existingEntities.get(JsonShape.Full);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.post().uri(resourceUri)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange()
                     .expectStatus().isEqualTo(409)
                     .expectBody().isEmpty();
@@ -203,106 +206,109 @@ public class CrudIntegrationTests {
     public class putTests {
         @Test
         public void putsToDB() {
-            DataGroup data = testCases.get(CaseType.ReplaceOneExisting);
+            DataGroup data = testData.existingEntities.get(JsonShape.FullAlt);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(data.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
             jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
+                        assertEquals(1, rs.getInt("id"));
                         data.assertDbState(rs);
                     });
         }
 
         @Test
         public void ommitedOptionalFieldsSetDefaultValues() {
-            DataGroup data = testCases.get(CaseType.ReplaceOneExistingMinumumFields);
+            DataGroup data = testData.existingEntities.get(JsonShape.MinimumFieldsAlt);
+            DataGroup response = testData.existingEntities.get(JsonShape.MinFieldsAltWithDefaults);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(response.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
             jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
-                        data.assertDbState(rs);
+                        response.assertDbState(rs);
                     });
         }
 
         @Test
         public void putCreatesNewResourceWhenNotInDB() {
-            DataGroup data = testCases.get(CaseType.ReplaceOneUnique);
+            DataGroup data = testData.uniqueEntities.get(JsonShape.Full);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.put().uri(resourceUri + "/{key}", newKey)
+            rest.put().uri(resourceUri + "/{key}", uniqueKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isCreated(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(data.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(1, rowsAfter - rowsBefore);
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
+                        assertEquals(rowsBefore + 1, rs.getInt("id"));
                         data.assertDbState(rs);
                     });
         }
 
         @Test
         public void seeOtherStatusWhenKeyChanges() {
-            DataGroup data = testCases.get(CaseType.ReplaceOneExistingNewKey);
+            DataGroup data = testData.uniqueEntities.get(JsonShape.Full);
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(resourceUri + "/{key}").build(newKey);
+                    .path(resourceUri + "/{key}").build(uniqueKey);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isEqualTo(303)
                                     .expectHeader().location(location.toString()),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(data.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
+                        assertEquals(1, rs.getInt("id"));
                         data.assertDbState(rs);
                     });
-
         }
         // Error tests
 
         @Test
         public void badRequestIfMissingFields() {
-            DataGroup data = testCases.get(CaseType.FailNotEnoughFields);
+            DataGroup data = testData.existingEntities.get(JsonShape.NotEnoughFields);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange()
                     .expectStatus().isBadRequest()
                     .expectBody().isEmpty();
@@ -316,16 +322,16 @@ public class CrudIntegrationTests {
     public class PatchTests {
         @Test
         public void patchesInDB() {
-            DataGroup data = testCases.get(CaseType.UpdateOneExisting);
+            DataGroup data = testData.existingEntities.get(JsonShape.FullAlt);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.patch().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(data.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -338,47 +344,49 @@ public class CrudIntegrationTests {
 
         @Test
         public void doesntTouchOmmitedFields() {
-            DataGroup data = testCases.get(CaseType.UpdateOneExistingMinimumFields);
+            DataGroup data = testData.existingEntities.get(JsonShape.NotEnoughFieldsAlt);
+            DataGroup expected = testData.existingEntities.get(JsonShape.NotEnoughAltMergeFull);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.patch().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isOk(),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(expected.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
             jdbc.sql(sqlSelectExisting())
                     .query((rs) -> {
-                        data.assertDbState(rs);
+                        expected.assertDbState(rs);
                     });
         }
 
         @Test
         public void seeOtherStatusWhenKeyChanges() {
-            DataGroup data = testCases.get(CaseType.UpdateOneExistingNewKey);
+            DataGroup data = testData.uniqueEntities.get(JsonShape.Full);
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(resourceUri + "/{key}").build(newKey);
+                    .path(resourceUri + "/{key}").build(uniqueKey);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
             rest.put().uri(resourceUri + "/{key}", existingKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange().expectAll(
                             r -> r.expectStatus().isEqualTo(303)
                                     .expectHeader().location(location.toString()),
-                            r -> r.expectBody().json(data.expectedJson));
+                            r -> r.expectBody().json(data.json));
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
 
             jdbc.sql(sqlSelectNew())
                     .query((rs) -> {
+                        assertEquals(1, rs.getInt("id"));
                         data.assertDbState(rs);
                     });
 
@@ -387,13 +395,13 @@ public class CrudIntegrationTests {
         // Error tests
         @Test
         public void notFoundIfNotInDB() {
-            DataGroup data = testCases.get(CaseType.FailUpdateNotExists);
+            DataGroup data = testData.uniqueEntities.get(JsonShape.Full);
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.patch().uri(resourceUri + "/{key}", newKey)
+            rest.patch().uri(resourceUri + "/{key}", uniqueKey)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(data.inputJson)
+                    .body(data.json)
                     .exchange()
                     .expectStatus().isNotFound()
                     .expectBody().isEmpty();
@@ -425,7 +433,7 @@ public class CrudIntegrationTests {
 
             int rowsBefore = countRowsInTable(jdbc, tableName);
 
-            rest.delete().uri(resourceUri + "/{key}", newKey)
+            rest.delete().uri(resourceUri + "/{key}", uniqueKey)
                     .exchange()
                     .expectStatus().isNotFound()
                     .expectBody().isEmpty();

@@ -49,7 +49,7 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
         }
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{key}").buildAndExpand(entity.getKey()).toUri();
+                .path("/{key}").buildAndExpand(entity.fetchKeyValue()).toUri();
 
         return ResponseEntity.created(location).body(created.resource);
     }
@@ -73,13 +73,13 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
         }
 
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(resourceUri + "/{key}").buildAndExpand(replacedEntity.getKey()).toUri();
+                .path(resourceUri + "/{key}").buildAndExpand(replacedEntity.fetchKeyValue()).toUri();
 
         if (replaced.wasCreated) {
             return ResponseEntity.created(location).body(replacedEntity);
         }
 
-        if (!key.equals(replacedEntity.getKey())) {
+        if (!key.equals(replacedEntity.fetchKeyValue())) {
             return ResponseEntity.status(303)
                     .header("Location", location.toString())
                     .body(replacedEntity);
@@ -95,9 +95,9 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
             return ResponseEntity.notFound().build();
         }
 
-        if (!key.equals(newEntity.getKey())) {
+        if (!key.equals(newEntity.fetchKeyValue())) {
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(resourceUri + "/{key}").buildAndExpand(newEntity.getKey()).toUri();
+                    .path(resourceUri + "/{key}").buildAndExpand(newEntity.fetchKeyValue()).toUri();
 
             return ResponseEntity.status(303)
                     .header("Location", location.toString())

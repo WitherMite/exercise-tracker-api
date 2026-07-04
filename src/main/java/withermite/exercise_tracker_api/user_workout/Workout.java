@@ -21,7 +21,7 @@ public class Workout implements Entity<Long> {
     public Float subjectiveEffortValue;
 
     @Override
-    public Long getKey() {
+    public Long fetchKeyValue() {
         return id;
     }
 

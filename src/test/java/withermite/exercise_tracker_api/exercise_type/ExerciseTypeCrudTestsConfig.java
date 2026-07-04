@@ -12,17 +12,13 @@ public class ExerciseTypeCrudTestsConfig implements CrudIntegrationTestsConfig {
     }
 
     @Override
-    public Map<String, DBRowType> getJsonPropToDbRowMap() {
+    public Map<String, Class<?>> getDbRowMapToTypeMap() {
         return Map.of(
-                "name",
-                new DBRowType("exercise_type_name", String.class),
-                "countType",
-                new DBRowType("count_type", String.class),
-                "loadType",
-                new DBRowType("load_type", String.class),
-                "workTimeType",
-                new DBRowType("work_time_type", String.class),
-                "restType",
-                new DBRowType("rest_type", String.class));
+                "id", Integer.class,
+                "exercise_type_name", String.class,
+                "count_type", String.class,
+                "load_type", String.class,
+                "work_time_type", String.class,
+                "rest_type", String.class);
     }
 }

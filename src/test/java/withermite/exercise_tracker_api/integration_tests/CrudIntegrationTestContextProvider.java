@@ -30,7 +30,7 @@ public class CrudIntegrationTestContextProvider implements ClassTemplateInvocati
         for (int i = 0; i < configSources.length; i++) {
             var config = configSources[i];
             FileSystemResource json = new FileSystemResource(filePrefix + config.getJsonFilepath());
-            this.configs[i] = new CrudIntegrationTestContext(json, config.getJsonPropToDbRowMap());
+            this.configs[i] = new CrudIntegrationTestContext(json, config.getDbRowMapToTypeMap());
         }
     }
 
@@ -76,8 +76,8 @@ public class CrudIntegrationTestContextProvider implements ClassTemplateInvocati
                                 crudTests.tableName = ctx.tableName;
                                 crudTests.keyRowName = ctx.keyRowName;
                                 crudTests.existingKey = ctx.existingKey;
-                                crudTests.newKey = ctx.newKey;
-                                crudTests.testCases = ctx.testData.testCases;
+                                crudTests.uniqueKey = ctx.newKey;
+                                crudTests.testData = ctx.testData;
                             }
                         });
             }

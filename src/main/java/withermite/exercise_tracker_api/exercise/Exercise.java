@@ -10,7 +10,7 @@ public class Exercise implements Entity<Long> {
     public ExerciseType exerciseType;
 
     @Override
-    public Long getKey() {
+    public Long fetchKeyValue() {
         return id;
     }
 

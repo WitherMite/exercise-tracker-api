@@ -1,212 +1,124 @@
 {
     "testName": "Exercise Type Tests",
     "resourceUri": "/exercise-types",
-    "tableName": "exercise_type",
-    "keyRowName": "exercise_type_name",
-    "existingKey": "Distance run",
-    "newKey": "Weightlifting",
     "populateSqlPath": "testsql/exercise_type/populate-exercise-type.sql",
+    "dbTableName": "exercise_type",
+    "dbKeyRowName": "exercise_type_name",
     "testData": {
-        "FailNotEnoughFields": {
-            "inputJson": {
-                "name": "Distance run",
-                "countType": "single"
-            },
-            "expectedJson": {}
+        "optionalFields": ["restType"],
+        "dbRowToFieldMapping": {
+            "exercise_type_name": "name",
+            "count_type": "countType",
+            "work_time_type": "workTimeType",
+            "load_type": "loadType",
+            "rest_type": "restType"
         },
-        "FailUpdateNotExists": {
-            "inputJson": {
-                "name": "Weightlifting",
-                "countType": "set"
+        "defaultValues": {
+            "entity": {
+                "restType": "optional"
             },
-            "expectedJson": {}
+            "database": {
+                "rest_type": "optional"
+            }
         },
-        "ReadOneExisting": {
-            "inputJson": {},
-            "expectedJson": {
+        "entityExisting": {
+            "keyValue": "Distance run",
+            "original": {
                 "name": "Distance run",
                 "countType": "single",
                 "workTimeType": "time",
                 "loadType": "distance",
                 "restType": "optional"
+            },
+            "alternateValues": {
+                "name": "Distance run",
+                "countType": "lap",
+                "workTimeType": "time",
+                "loadType": "distance",
+                "restType": "afterCount"
+            },
+            "dbStateOriginal": {
+                "exercise_type_name": "Distance run",
+                "count_type": "single",
+                "work_time_type": "time",
+                "load_type": "distance",
+                "rest_type": "optional"
+            },
+            "dbStateAlternate": {
+                "exercise_type_name": "Distance run",
+                "count_type": "lap",
+                "work_time_type": "time",
+                "load_type": "distance",
+                "rest_type": "afterCount"
             }
         },
-        "ReadFiveExisting": {
-            "inputJson": {},
-            "expectedJson": [
-                {
-                    "name": "Distance run",
-                    "countType": "single",
-                    "workTimeType": "time",
-                    "loadType": "distance",
-                    "restType": "optional"
-                },
-                {
-                    "name": "Distance run 2",
-                    "countType": "single",
-                    "workTimeType": "time",
-                    "loadType": "distance",
-                    "restType": "optional"
-                },
-                {
-                    "name": "Distance run 3",
-                    "countType": "single",
-                    "workTimeType": "time",
-                    "loadType": "distance",
-                    "restType": "optional"
-                },
-                {
-                    "name": "Distance run 4",
-                    "countType": "single",
-                    "workTimeType": "time",
-                    "loadType": "distance",
-                    "restType": "optional"
-                },
-                {
-                    "name": "Distance run 5",
-                    "countType": "single",
-                    "workTimeType": "time",
-                    "loadType": "distance",
-                    "restType": "optional"
-                }
-            ]
-        },
-        "ReadThirdAndFourthExisting": {
-            "inputJson": {},
-            "expectedJson": [
-                {
-                    "name": "Distance run 3",
-                    "countType": "single",
-                    "workTimeType": "time",
-                    "loadType": "distance",
-                    "restType": "optional"
-                },
-                {
-                    "name": "Distance run 4",
-                    "countType": "single",
-                    "workTimeType": "time",
-                    "loadType": "distance",
-                    "restType": "optional"
-                }
-            ]
-        },
-        "CreateOneUniqueMinimumFields": {
-            "inputJson": {
-                "name": "Weightlifting",
-                "countType": "set",
-                "workTimeType": "repetition",
-                "loadType": "weight"
-            },
-            "expectedJson": {
+        "entityUnique": {
+            "keyValue": "Weightlifting",
+            "original": {
                 "name": "Weightlifting",
                 "countType": "set",
                 "workTimeType": "repetition",
                 "loadType": "weight",
                 "restType": "optional"
+            },
+            "alternateValues": {
+                "name": "Weightlifting",
+                "countType": "single",
+                "workTimeType": "repetition",
+                "loadType": "weight",
+                "restType": "afterCount"
+            },
+            "dbStateOriginal": {
+                "exercise_type_name": "Weightlifting",
+                "count_type": "set",
+                "work_time_type": "repetition",
+                "load_type": "weight",
+                "rest_type": "optional"
+            },
+            "dbStateAlternate": {
+                "exercise_type_name": "Weightlifting",
+                "count_type": "single",
+                "work_time_type": "repetition",
+                "load_type": "weight",
+                "rest_type": "afterCount"
             }
         },
-        "ReplaceOneExisting": {
-            "inputJson": {
+        "defaultFullPageResponse": [
+            {
                 "name": "Distance run",
                 "countType": "single",
                 "workTimeType": "time",
                 "loadType": "distance",
-                "restType": "afterCount"
+                "restType": "optional"
             },
-            "expectedJson": {
-                "name": "Distance run",
+            {
+                "name": "Distance run 2",
                 "countType": "single",
                 "workTimeType": "time",
                 "loadType": "distance",
-                "restType": "afterCount"
-            }
-        },
-        "ReplaceOneExistingMinumumFields": {
-            "inputJson": {
-                "name": "Distance run",
-                "countType": "lap",
-                "workTimeType": "time",
-                "loadType": "distance"
+                "restType": "optional"
             },
-            "expectedJson": {
-                "name": "Distance run",
-                "countType": "lap",
+            {
+                "name": "Distance run 3",
+                "countType": "single",
                 "workTimeType": "time",
                 "loadType": "distance",
                 "restType": "optional"
-            }
-        },
-        "ReplaceOneUnique": {
-            "inputJson": {
-                "name": "Weightlifting",
-                "countType": "set",
-                "workTimeType": "repetition",
-                "loadType": "weight",
-                "restType": "afterCount"
             },
-            "expectedJson": {
-                "name": "Weightlifting",
-                "countType": "set",
-                "workTimeType": "repetition",
-                "loadType": "weight",
-                "restType": "afterCount"
-            }
-        },
-        "ReplaceOneExistingNewKey": {
-            "inputJson": {
-                "name": "Weightlifting",
-                "countType": "set",
-                "workTimeType": "repetition",
-                "loadType": "weight",
-                "restType": "afterCount"
-            },
-            "expectedJson": {
-                "name": "Weightlifting",
-                "countType": "set",
-                "workTimeType": "repetition",
-                "loadType": "weight",
-                "restType": "afterCount"
-            }
-        },
-        "UpdateOneExisting": {
-            "inputJson": {
-                "name": "Distance run",
-                "countType": "lap",
-                "workTimeType": "time",
-                "loadType": "distance",
-                "restType": "afterCount"
-            },
-            "expectedJson": {
-                "name": "Distance run",
-                "countType": "lap",
-                "workTimeType": "time",
-                "loadType": "distance",
-                "restType": "afterCount"
-            }
-        },
-        "UpdateOneExistingMinimumFields": {
-            "inputJson": {
-                "countType": "lap"
-            },
-            "expectedJson": {
-                "name": "Distance run",
-                "countType": "lap",
+            {
+                "name": "Distance run 4",
+                "countType": "single",
                 "workTimeType": "time",
                 "loadType": "distance",
                 "restType": "optional"
-            }
-        },
-        "UpdateOneExistingNewKey": {
-            "inputJson": {
-                "name": "Weightlifting"
             },
-            "expectedJson": {
-                "name": "Weightlifting",
+            {
+                "name": "Distance run 5",
                 "countType": "single",
                 "workTimeType": "time",
                 "loadType": "distance",
                 "restType": "optional"
             }
-        }
+        ]
     }
 }
