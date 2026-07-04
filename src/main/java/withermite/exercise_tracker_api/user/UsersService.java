@@ -19,11 +19,13 @@ public class UsersService implements CrudService<User> {
 
     @Override
     public ResourceWrapper<User> create(User user) {
-        if (user.username == null || user.displayname == null) {
-            return null;
-        }
         try {
             return new ResourceWrapper<>(usersRepository.save(user));
+            // replace this with global error handler, and check that
+            // it rolls back on failure
+            // is probably faster not to check unique constraints first?
+            // both end up touching the db anyway, one just means every request hits twice,
+            // instead of letting attempts fail
         } catch (DataIntegrityViolationException e) {
             String causeMsg = e.getCause().getMessage();
             ArrayList<String> problems = new ArrayList<>();
@@ -48,9 +50,6 @@ public class UsersService implements CrudService<User> {
 
     @Override
     public ResourceWrapper<User> replace(String username, User user) {
-        if (user.username == null || user.displayname == null) {
-            return new ResourceWrapper<>(null);
-        }
         return usersRepository.replace(username, user);
     }
 

@@ -5,12 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -116,28 +114,4 @@ public class UsersServiceTests {
     }
 
     // Edge cases
-
-    @Test
-    public void createShouldNotAllowIncompleteUsers() {
-        String username = "frank";
-        User user = new User();
-        user.username = username;
-
-        ResourceWrapper<User> result = usersService.create(user);
-
-        verify(usersRepository, never()).save(any(User.class));
-        assertEquals(null, result);
-    }
-
-    @Test
-    public void replaceShouldNotAllowIncompleteUsers() {
-        String username = "frank";
-        User user = new User();
-        user.username = username;
-
-        User changedUser = usersService.replace(username, user).resource;
-
-        verify(usersRepository, never()).replace(anyString(), any(User.class));
-        assertEquals(null, changedUser);
-    }
 }

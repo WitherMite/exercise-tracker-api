@@ -1,6 +1,6 @@
 # To do:
 
-- Do request validation the spring way (whatever that is xD)
-- Generic JOOQ record mapper/unmapper? (low priority tbh)
-- Generic CrudService implementation (depends how req validation works)
-- Repository interface if generic CrudService
+- Do request validation the spring way
+    - jakarta constraint validation annotations
+    - global and controller handler method error handlers
+    - validation groups for methods that have different constraints (like PATCH)

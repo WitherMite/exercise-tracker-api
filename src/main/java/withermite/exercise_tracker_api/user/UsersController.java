@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import withermite.exercise_tracker_api._util.crud_behaviors.CrudControllerBehavior;
 
 @RestController
@@ -34,7 +35,7 @@ class UsersController {
     }
 
     @PostMapping
-    public ResponseEntity<User> create(@RequestBody User user) {
+    public ResponseEntity<User> create(@Valid @RequestBody User user) {
         return crud.create(user);
     }
 
@@ -44,7 +45,7 @@ class UsersController {
     }
 
     @PutMapping("/{key}")
-    public ResponseEntity<User> replace(@PathVariable String key, @RequestBody User user) {
+    public ResponseEntity<User> replace(@PathVariable String key, @Valid @RequestBody User user) {
         return crud.replace(key, user);
     }
 

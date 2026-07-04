@@ -177,8 +177,7 @@ public class CrudIntegrationTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(data.json)
                     .exchange()
-                    .expectStatus().isBadRequest()
-                    .expectBody().isEmpty();
+                    .expectStatus().isBadRequest();
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -310,8 +309,7 @@ public class CrudIntegrationTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(data.json)
                     .exchange()
-                    .expectStatus().isBadRequest()
-                    .expectBody().isEmpty();
+                    .expectStatus().isBadRequest();
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
