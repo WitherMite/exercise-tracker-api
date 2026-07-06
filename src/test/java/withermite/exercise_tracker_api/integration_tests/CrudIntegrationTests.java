@@ -137,6 +137,20 @@ public class CrudIntegrationTests {
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
         }
+
+        @Test
+        public void badRequestIfInvalidPaginationParams() {
+
+            int rowsBefore = countRowsInTable(jdbc, tableName);
+
+            rest.get().uri(resourceUri + "?limit=foo&offset=-1")
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange().expectAll(
+                            r -> r.expectStatus().isBadRequest());
+
+            int rowsAfter = countRowsInTable(jdbc, tableName);
+            assertEquals(rowsBefore, rowsAfter);
+        }
     }
 
     @Nested

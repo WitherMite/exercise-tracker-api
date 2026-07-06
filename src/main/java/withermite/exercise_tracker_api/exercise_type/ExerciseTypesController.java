@@ -1,10 +1,10 @@
 package withermite.exercise_tracker_api.exercise_type;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import withermite.exercise_tracker_api._util.crud_behaviors.CrudControllerBehavior;
+import withermite.exercise_tracker_api._util.crud_behaviors.PaginationParams;
+import withermite.exercise_tracker_api._util.validation.ValidationGroups.AsDelta;
+import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 
 @RestController
 @RequestMapping("/exercise-types")
@@ -32,12 +34,12 @@ class ExerciseTypesController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExerciseType>> getMany(@RequestParam Map<String, String> params) {
+    public ResponseEntity<List<ExerciseType>> getMany(@Valid PaginationParams params) {
         return crud.getMany(params);
     }
 
     @PostMapping
-    public ResponseEntity<ExerciseType> create(@Valid @RequestBody ExerciseType exerciseType) {
+    public ResponseEntity<ExerciseType> create(@Validated(Full.class) @RequestBody ExerciseType exerciseType) {
         return crud.create(exerciseType);
     }
 
@@ -48,13 +50,13 @@ class ExerciseTypesController {
 
     @PutMapping("/{key}")
     public ResponseEntity<ExerciseType> replace(@PathVariable String key,
-            @RequestBody @Valid ExerciseType exerciseType) {
+            @Validated(Full.class) @RequestBody @Valid ExerciseType exerciseType) {
         return crud.replace(key, exerciseType);
     }
 
     @PatchMapping("/{key}")
     public ResponseEntity<ExerciseType> update(@PathVariable String key,
-            @RequestBody ExerciseType exerciseType) {
+            @Validated(AsDelta.class) @RequestBody ExerciseType exerciseType) {
         return crud.update(key, exerciseType);
     }
 
