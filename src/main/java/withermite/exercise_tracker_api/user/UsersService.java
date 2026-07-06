@@ -1,9 +1,7 @@
 package withermite.exercise_tracker_api.user;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import withermite.exercise_tracker_api._util.ResourceWrapper;
@@ -18,24 +16,8 @@ public class UsersService implements CrudService<User> {
     }
 
     @Override
-    public ResourceWrapper<User> create(User user) {
-        try {
-            return new ResourceWrapper<>(usersRepository.save(user));
-            // replace this with global error handler, and check that
-            // it rolls back on failure
-            // is probably faster not to check unique constraints first?
-            // both end up touching the db anyway, one just means every request hits twice,
-            // instead of letting attempts fail
-        } catch (DataIntegrityViolationException e) {
-            String causeMsg = e.getCause().getMessage();
-            ArrayList<String> problems = new ArrayList<>();
-            System.err.println(e.toString());
-            System.err.println(causeMsg);
-            if (causeMsg.contains("duplicate key value violates unique constraint \"user_natural_key\"")) {
-                problems.add("username " + user.username + " taken");
-            }
-            return new ResourceWrapper<>(null, problems);
-        }
+    public User create(User user) {
+        return usersRepository.save(user);
     }
 
     @Override

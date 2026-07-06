@@ -6,7 +6,6 @@ import org.jooq.DSLContext;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
-import org.jooq.exception.DataAccessException;
 
 import withermite.exercise_tracker_api._util.EntityMerger;
 import withermite.exercise_tracker_api._util.ResourceWrapper;
@@ -51,42 +50,30 @@ public class CrudRepositoryBehavior<E extends Entity<T>, R extends UpdatableReco
     }
 
     public E update(T key, E entity) {
-        try {
-            R record = create.fetchOne(
-                    table, tableKey.eq(key));
+        R record = create.fetchOne(
+                table, tableKey.eq(key));
 
-            if (record != null) {
-                unmapper.unmapDiff(entity, record);
-                record.update();
-                return record.into(entityType);
-            }
-            return null;
-
-        } catch (DataAccessException e) {
-            System.err.println(e.getMessage());
-            return null;
+        if (record != null) {
+            unmapper.unmapDiff(entity, record);
+            record.update();
+            return record.into(entityType);
         }
+        return null;
     }
 
     public ResourceWrapper<E> replace(T key, E entity) {
-        try {
-            // try to get from db
-            R record = create.fetchOne(
-                    table, tableKey.eq(key));
+        // try to get from db
+        R record = create.fetchOne(
+                table, tableKey.eq(key));
 
-            // if was in db, replace all values, and update
-            if (record != null) {
-                record.from(entity);
-                record.update();
-                return new ResourceWrapper<>(record.into(entityType));
-            }
-            // if not in db create new
-            return new ResourceWrapper<>(save(entity), true);
-
-        } catch (DataAccessException e) {
-            System.err.println(e.getMessage());
-            return null;
+        // if was in db, replace all values, and update
+        if (record != null) {
+            record.from(entity);
+            record.update();
+            return new ResourceWrapper<>(record.into(entityType));
         }
+        // if not in db create new
+        return new ResourceWrapper<>(save(entity), true);
     }
 
     public boolean delete(T key) {

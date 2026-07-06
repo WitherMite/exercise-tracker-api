@@ -17,8 +17,8 @@ public class ExerciseTypesService implements CrudService<ExerciseType> {
     }
 
     @Override
-    public ResourceWrapper<ExerciseType> create(ExerciseType exerciseType) {
-        return new ResourceWrapper<>(exerciseTypesRepository.save(exerciseType));
+    public ExerciseType create(ExerciseType exerciseType) {
+        return exerciseTypesRepository.save(exerciseType);
     }
 
     @Override

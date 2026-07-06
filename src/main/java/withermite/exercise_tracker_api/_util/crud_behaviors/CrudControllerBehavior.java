@@ -38,20 +38,10 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
     }
 
     public ResponseEntity<E> create(E entity) {
-        ResourceWrapper<E> created = service.create(entity);
-
-        if (created == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (created.problems != null) {
-            return ResponseEntity.status(409).build();
-        }
-
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{key}").buildAndExpand(entity.fetchKeyValue()).toUri();
 
-        return ResponseEntity.created(location).body(created.resource);
+        return ResponseEntity.created(location).body(service.create(entity));
     }
 
     public ResponseEntity<E> getOne(String key) {

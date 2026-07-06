@@ -193,8 +193,7 @@ public class CrudIntegrationTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(data.json)
                     .exchange()
-                    .expectStatus().isEqualTo(409)
-                    .expectBody().isEmpty();
+                    .expectStatus().isEqualTo(409);
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
