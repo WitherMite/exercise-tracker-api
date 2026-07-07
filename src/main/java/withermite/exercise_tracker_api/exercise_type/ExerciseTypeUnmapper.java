@@ -8,7 +8,7 @@ import org.jooq.generated.enums.RestTypeEnum;
 import org.jooq.generated.enums.WorkTimeTypeEnum;
 import org.jooq.generated.tables.records.ExerciseTypeRecord;
 
-import withermite.exercise_tracker_api._util.EntityMerger;
+import withermite.exercise_tracker_api._util.crud_behaviors.EntityMerger;
 
 public class ExerciseTypeUnmapper
         implements EntityMerger<ExerciseType, ExerciseTypeRecord>, RecordUnmapper<ExerciseType, ExerciseTypeRecord> {

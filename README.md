@@ -4,3 +4,5 @@
 - Do request validation the spring way
     - global (controller advice) and controller handler method error handlers
         - test for problem detail shape
+- Add other endpoints
+- Implement security

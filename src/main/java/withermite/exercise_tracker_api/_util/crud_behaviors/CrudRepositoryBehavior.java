@@ -7,7 +7,6 @@ import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UpdatableRecord;
 
-import withermite.exercise_tracker_api._util.EntityMerger;
 import withermite.exercise_tracker_api._util.ResourceWrapper;
 import withermite.exercise_tracker_api.errors.ResourceNotFoundException;
 
