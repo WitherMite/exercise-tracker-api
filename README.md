@@ -2,7 +2,5 @@
 
 - See if a better way to do what i am doing with the ResourceWrapper to pass information about if a resource was created
 - Do request validation the spring way
-    - jakarta constraint validation annotations
-        - validate strings against enums
     - global (controller advice) and controller handler method error handlers
         - test for problem detail shape
