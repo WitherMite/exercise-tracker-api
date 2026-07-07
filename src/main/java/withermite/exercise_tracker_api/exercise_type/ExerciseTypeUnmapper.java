@@ -12,7 +12,10 @@ import withermite.exercise_tracker_api._util.EntityMerger;
 
 public class ExerciseTypeUnmapper
         implements EntityMerger<ExerciseType, ExerciseTypeRecord>, RecordUnmapper<ExerciseType, ExerciseTypeRecord> {
+
     @Override
+    @SuppressWarnings("null") // thinks fields can never be null, when that is not true, remove while changing
+                              // this method to catch other null warnings
     public void unmapDiff(ExerciseType exerciseType, ExerciseTypeRecord record) {
         if (record == null)
             return;

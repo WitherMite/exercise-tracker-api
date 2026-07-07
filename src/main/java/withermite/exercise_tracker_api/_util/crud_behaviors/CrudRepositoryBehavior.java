@@ -9,6 +9,7 @@ import org.jooq.UpdatableRecord;
 
 import withermite.exercise_tracker_api._util.EntityMerger;
 import withermite.exercise_tracker_api._util.ResourceWrapper;
+import withermite.exercise_tracker_api.errors.ResourceNotFoundException;
 
 public class CrudRepositoryBehavior<E extends Entity<T>, R extends UpdatableRecord<R>, T> {
     private final DSLContext create;
@@ -38,10 +39,10 @@ public class CrudRepositoryBehavior<E extends Entity<T>, R extends UpdatableReco
         R record = create.fetchOne(
                 table, tableKey.eq(key));
 
-        if (record != null) {
-            return record.into(entityType);
+        if (record == null) {
+            throw new ResourceNotFoundException("Resource " + key + " did not exist");
         }
-        return null;
+        return record.into(entityType);
     }
 
     public List<E> getMany(int pageSize, int offset) {
@@ -53,12 +54,12 @@ public class CrudRepositoryBehavior<E extends Entity<T>, R extends UpdatableReco
         R record = create.fetchOne(
                 table, tableKey.eq(key));
 
-        if (record != null) {
-            unmapper.unmapDiff(entity, record);
-            record.update();
-            return record.into(entityType);
+        if (record == null) {
+            throw new ResourceNotFoundException("Resource " + key + " did not exist");
         }
-        return null;
+        unmapper.unmapDiff(entity, record);
+        record.update();
+        return record.into(entityType);
     }
 
     public ResourceWrapper<E> replace(T key, E entity) {
@@ -76,14 +77,13 @@ public class CrudRepositoryBehavior<E extends Entity<T>, R extends UpdatableReco
         return new ResourceWrapper<>(save(entity), true);
     }
 
-    public boolean delete(T key) {
+    public void delete(T key) {
         R record = create.fetchOne(
                 table, tableKey.eq(key));
 
         if (record == null) {
-            return false;
+            throw new ResourceNotFoundException("Resource " + key + " did not exist");
         }
         record.delete();
-        return true;
     }
 }

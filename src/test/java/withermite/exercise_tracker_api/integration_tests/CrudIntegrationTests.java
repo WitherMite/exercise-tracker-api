@@ -131,8 +131,7 @@ public class CrudIntegrationTests {
 
             rest.get().uri(resourceUri + "/{key}", uniqueKey)
                     .exchange()
-                    .expectStatus().isNotFound()
-                    .expectBody().isEmpty();
+                    .expectStatus().isNotFound();
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -414,8 +413,7 @@ public class CrudIntegrationTests {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(data.json)
                     .exchange()
-                    .expectStatus().isNotFound()
-                    .expectBody().isEmpty();
+                    .expectStatus().isNotFound();
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);
@@ -446,8 +444,7 @@ public class CrudIntegrationTests {
 
             rest.delete().uri(resourceUri + "/{key}", uniqueKey)
                     .exchange()
-                    .expectStatus().isNotFound()
-                    .expectBody().isEmpty();
+                    .expectStatus().isNotFound();
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore, rowsAfter);

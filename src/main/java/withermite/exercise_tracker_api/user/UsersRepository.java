@@ -64,7 +64,7 @@ public class UsersRepository {
         }
     }
 
-    public boolean delete(String username) {
-        return crud.delete(username);
+    public void delete(String username) {
+        crud.delete(username);
     }
 }

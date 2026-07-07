@@ -40,7 +40,7 @@ public class ExerciseTypesRepository {
         return crud.replace(name, exerciseType);
     }
 
-    public boolean delete(String name) {
-        return crud.delete(name);
+    public void delete(String name) {
+        crud.delete(name);
     }
 }

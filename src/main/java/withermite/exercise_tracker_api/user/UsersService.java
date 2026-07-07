@@ -41,7 +41,7 @@ public class UsersService implements CrudService<User> {
     }
 
     @Override
-    public boolean delete(String username) {
-        return usersRepository.delete(username);
+    public void delete(String username) {
+        usersRepository.delete(username);
     }
 }

@@ -42,8 +42,7 @@ public class ExerciseTypesService implements CrudService<ExerciseType> {
     }
 
     @Override
-    public boolean delete(String name) {
-        return exerciseTypesRepository.delete(name);
+    public void delete(String name) {
+        exerciseTypesRepository.delete(name);
     }
-
 }

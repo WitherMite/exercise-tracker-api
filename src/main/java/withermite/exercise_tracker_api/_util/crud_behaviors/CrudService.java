@@ -15,5 +15,5 @@ public interface CrudService<E extends Entity<?>> {
 
     public E update(String key, E entity);
 
-    public boolean delete(String key);
+    public void delete(String key);
 }

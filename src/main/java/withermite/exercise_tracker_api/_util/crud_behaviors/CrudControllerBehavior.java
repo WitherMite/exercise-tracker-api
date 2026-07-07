@@ -3,6 +3,7 @@ package withermite.exercise_tracker_api._util.crud_behaviors;
 import java.net.URI;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -38,10 +39,6 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
     public ResponseEntity<E> getOne(String key) {
         E entity = service.findOne(key);
 
-        if (entity == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         return ResponseEntity.ok().body(entity);
     }
 
@@ -56,7 +53,7 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
         }
 
         if (!key.equals(replacedEntity.fetchKeyValue())) {
-            return ResponseEntity.status(303)
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
                     .header("Location", location.toString())
                     .body(replacedEntity);
         }
@@ -67,15 +64,11 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
     public ResponseEntity<E> update(String key, E entity) {
         E newEntity = service.update(key, entity);
 
-        if (newEntity == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         if (!key.equals(newEntity.fetchKeyValue())) {
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(resourceUri + "/{key}").buildAndExpand(newEntity.fetchKeyValue()).toUri();
 
-            return ResponseEntity.status(303)
+            return ResponseEntity.status(HttpStatus.SEE_OTHER)
                     .header("Location", location.toString())
                     .body(newEntity);
         }
@@ -84,11 +77,7 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
     }
 
     public ResponseEntity<Void> delete(String key) {
-        boolean deleted = service.delete(key);
-
-        if (!deleted) {
-            return ResponseEntity.notFound().build();
-        }
+        service.delete(key);
         return ResponseEntity.noContent().build();
     }
 }
