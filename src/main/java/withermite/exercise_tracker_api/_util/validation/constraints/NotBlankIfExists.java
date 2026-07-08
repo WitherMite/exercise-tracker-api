@@ -10,7 +10,7 @@ import jakarta.validation.Payload;
 import withermite.exercise_tracker_api._util.validation.validators.NotBlankIfExistsValidator;
 
 @Constraint(validatedBy = NotBlankIfExistsValidator.class)
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target({ ElementType.FIELD, ElementType.PARAMETER, ElementType.TYPE_USE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NotBlankIfExists {
     String message() default "String must not be blank";

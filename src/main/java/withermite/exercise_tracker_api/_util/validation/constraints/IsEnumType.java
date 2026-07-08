@@ -12,7 +12,7 @@ import jakarta.validation.Payload;
 import withermite.exercise_tracker_api._util.validation.validators.IsEnumTypeValidator;
 
 @Constraint(validatedBy = IsEnumTypeValidator.class)
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Target({ ElementType.FIELD, ElementType.PARAMETER, ElementType.TYPE_USE })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IsEnumType {
     Class<? extends EnumType> enumTypeClass();
