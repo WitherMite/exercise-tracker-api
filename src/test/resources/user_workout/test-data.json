@@ -1,0 +1,30 @@
+{
+    "testName": "Workout Tests",
+    "resourceUri": "/users/frank/workouts",
+    "populateSqlPath": "testsql/user_workout/populate-workout.sql",
+    "dbTableName": "user_exercises",
+    "dbKeyRowName": "",
+    "testData": {
+        "optionalFields": [],
+        "dbRowToFieldMapping": {},
+        "defaultValues": {
+            "entity": {},
+            "database": {}
+        },
+        "entityExisting": {
+            "keyValue": "",
+            "original": {},
+            "alternateValues": {},
+            "dbStateOriginal": {},
+            "dbStateAlternate": {}
+        },
+        "entityUnique": {
+            "keyValue": "",
+            "original": {},
+            "alternateValues": {},
+            "dbStateOriginal": {},
+            "dbStateAlternate": {}
+        },
+        "defaultFullPageResponse": []
+    }
+}

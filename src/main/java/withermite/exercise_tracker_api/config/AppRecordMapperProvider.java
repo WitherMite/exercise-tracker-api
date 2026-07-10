@@ -7,6 +7,8 @@ import org.jooq.RecordMapperProvider;
 import org.jooq.RecordType;
 import org.jooq.impl.DefaultRecordMapper;
 
+import withermite.exercise_tracker_api.exercise.Exercise;
+import withermite.exercise_tracker_api.exercise.ExerciseMapper;
 import withermite.exercise_tracker_api.exercise_type.ExerciseType;
 import withermite.exercise_tracker_api.exercise_type.ExerciseTypeMapper;
 import withermite.exercise_tracker_api.user.User;
@@ -16,6 +18,7 @@ public class AppRecordMapperProvider implements RecordMapperProvider {
     private final Configuration config;
     private final UserMapper userMapper = new UserMapper();
     private final ExerciseTypeMapper exerciseTypeMapper = new ExerciseTypeMapper();
+    private final ExerciseMapper exerciseMapper = new ExerciseMapper();
 
     public AppRecordMapperProvider(Configuration config) {
         this.config = config;
@@ -31,6 +34,9 @@ public class AppRecordMapperProvider implements RecordMapperProvider {
         }
         if (ExerciseType.class.isAssignableFrom(type)) {
             return (RecordMapper<R, E>) exerciseTypeMapper;
+        }
+        if (Exercise.class.isAssignableFrom(type)) {
+            return (RecordMapper<R, E>) exerciseMapper;
         }
         return new DefaultRecordMapper<>(recordType, type, config);
     }

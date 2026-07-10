@@ -1,6 +1,7 @@
 package withermite.exercise_tracker_api.errors;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -20,19 +21,21 @@ public class ErrorControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(DataIntegrityViolationException e) {
-        // todo: check exception for cause
+        if (e instanceof DuplicateKeyException) {
+            ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
 
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+            // todo: add information to problem detail
 
-        // todo: add information to problem detail
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
+        }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
+        return handleUncaught(e);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleUncaught(Exception e) {
+        System.err.println(e);
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        // todo, build problem detail
         return ResponseEntity.internalServerError().body(problem);
     }
 }
