@@ -6,3 +6,5 @@
         - test for problem detail shape
 - Add other endpoints
 - Implement security
+    - decide how to change user creation to work with security framework
+    - write security tests
