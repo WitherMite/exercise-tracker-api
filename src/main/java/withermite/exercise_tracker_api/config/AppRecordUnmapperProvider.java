@@ -1,6 +1,7 @@
 package withermite.exercise_tracker_api.config;
 
 import org.jooq.Configuration;
+import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordType;
 import org.jooq.RecordUnmapper;
@@ -16,12 +17,16 @@ import withermite.exercise_tracker_api.user.UserUnmapper;
 
 public class AppRecordUnmapperProvider implements RecordUnmapperProvider {
     private final Configuration config;
-    private final UserUnmapper userUnmapper = new UserUnmapper();
-    private final ExerciseTypeUnmapper exerciseTypeUnmapper = new ExerciseTypeUnmapper();
-    private final ExerciseUnmapper exerciseUnmapper = new ExerciseUnmapper();
+    private final UserUnmapper userUnmapper;
+    private final ExerciseTypeUnmapper exerciseTypeUnmapper;
+    private final ExerciseUnmapper exerciseUnmapper;
 
     public AppRecordUnmapperProvider(Configuration config) {
         this.config = config;
+        DSLContext create = config.dsl();
+        this.exerciseUnmapper = new ExerciseUnmapper(create);
+        this.exerciseTypeUnmapper = new ExerciseTypeUnmapper(create);
+        this.userUnmapper = new UserUnmapper(create);
     }
 
     @SuppressWarnings("unchecked")

@@ -19,7 +19,7 @@ public class UsersRepository {
     public UsersRepository(DSLContext dslContext) {
         this.create = dslContext;
         this.crud = new CrudRepositoryBehavior<>(
-                dslContext, APP_USER, APP_USER.USERNAME, User.class, new UserUnmapper());
+                dslContext, APP_USER, APP_USER.USERNAME, User.class, new UserUnmapper(dslContext));
     }
 
     public User save(User user) {

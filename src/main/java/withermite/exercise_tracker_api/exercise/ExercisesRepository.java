@@ -17,7 +17,7 @@ public class ExercisesRepository {
     public ExercisesRepository(DSLContext dslContext) {
         this.crud = new CrudRepositoryBehavior<>(
                 dslContext, EXERCISE, EXERCISE.EXERCISE_NAME,
-                Exercise.class, new ExerciseUnmapper());
+                Exercise.class, new ExerciseUnmapper(dslContext));
     }
 
     public Exercise save(Exercise exercise) {
