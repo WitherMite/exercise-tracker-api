@@ -10,7 +10,7 @@ import org.jooq.UpdatableRecord;
 import withermite.exercise_tracker_api._util.ResourceWrapper;
 import withermite.exercise_tracker_api.errors.ResourceNotFoundException;
 
-public class CrudRepositoryBehavior<E extends Entity<T>, R extends UpdatableRecord<R>, T> {
+public class CrudRepositoryBehavior<E, R extends UpdatableRecord<R>, T> implements CrudRepository<E, T> {
     private final DSLContext create;
     private final Class<E> entityType;
     private final Table<R> table;

@@ -1,5 +1,7 @@
 package withermite.exercise_tracker_api.exercise_type;
 
+import java.util.Map;
+
 import org.jooq.generated.enums.CountTypeEnum;
 import org.jooq.generated.enums.LoadTypeEnum;
 import org.jooq.generated.enums.RestTypeEnum;
@@ -14,7 +16,7 @@ import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 import withermite.exercise_tracker_api._util.validation.constraints.IsEnumType;
 import withermite.exercise_tracker_api._util.validation.constraints.NotBlankIfExists;
 
-public class ExerciseType implements Entity<String> {
+public class ExerciseType implements Entity {
 
     @NotBlank(message = "Name must not be blank", groups = Full.class)
     @NotBlankIfExists(message = "Name must not be blank", groups = AsDelta.class)
@@ -36,8 +38,8 @@ public class ExerciseType implements Entity<String> {
     public String restType;
 
     @Override
-    public String fetchKeyValue() {
-        return name;
+    public Map<String, String> fetchUriKeys() {
+        return Map.of("key", name);
     }
 
 }

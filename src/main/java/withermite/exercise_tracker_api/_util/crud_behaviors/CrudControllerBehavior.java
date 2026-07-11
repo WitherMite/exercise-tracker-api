@@ -9,7 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import withermite.exercise_tracker_api._util.ResourceWrapper;
 
-public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E>> {
+public class CrudControllerBehavior<E extends Entity, S extends CrudService<E>> {
     private final S service;
     private final int defaultPageSize;
     private final String resourceUri;
@@ -31,7 +31,7 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
 
     public ResponseEntity<E> create(E entity) {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{key}").buildAndExpand(entity.fetchKeyValue()).toUri();
+                .path("/{key}").buildAndExpand(entity.fetchUriKeys()).toUri();
 
         return ResponseEntity.created(location).body(service.create(entity));
     }
@@ -46,13 +46,13 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
         ResourceWrapper<E> replaced = service.replace(key, entity);
         E replacedEntity = replaced.resource;
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path(resourceUri + "/{key}").buildAndExpand(replacedEntity.fetchKeyValue()).toUri();
+                .path(resourceUri + "/{key}").buildAndExpand(replacedEntity.fetchUriKeys()).toUri();
 
         if (replaced.wasCreated) {
             return ResponseEntity.created(location).body(replacedEntity);
         }
 
-        if (!key.equals(replacedEntity.fetchKeyValue())) {
+        if (!key.equals(replacedEntity.fetchUriKeys().get("key"))) {
             return ResponseEntity.status(HttpStatus.SEE_OTHER)
                     .header("Location", location.toString())
                     .body(replacedEntity);
@@ -64,9 +64,9 @@ public class CrudControllerBehavior<E extends Entity<?>, S extends CrudService<E
     public ResponseEntity<E> update(String key, E entity) {
         E newEntity = service.update(key, entity);
 
-        if (!key.equals(newEntity.fetchKeyValue())) {
+        if (!key.equals(newEntity.fetchUriKeys().get("key"))) {
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path(resourceUri + "/{key}").buildAndExpand(newEntity.fetchKeyValue()).toUri();
+                    .path(resourceUri + "/{key}").buildAndExpand(newEntity.fetchUriKeys()).toUri();
 
             return ResponseEntity.status(HttpStatus.SEE_OTHER)
                     .header("Location", location.toString())

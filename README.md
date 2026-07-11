@@ -6,7 +6,6 @@
     - global (controller advice) and controller handler method error handlers
         - test for problem detail shape
 - Add other endpoints
-    - fix location header dropping parts of uri for 303 see other responses
     - test moving exercises to other exercise types, disallow this for user workouts
     - test changing children for coupled 1:many relationships (like lists of workout statistics)
 - Implement security

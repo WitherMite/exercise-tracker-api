@@ -8,10 +8,11 @@ import org.jooq.generated.tables.records.ExerciseRecord;
 import org.springframework.stereotype.Repository;
 
 import withermite.exercise_tracker_api._util.ResourceWrapper;
+import withermite.exercise_tracker_api._util.crud_behaviors.CrudRepository;
 import withermite.exercise_tracker_api._util.crud_behaviors.CrudRepositoryBehavior;
 
 @Repository
-public class ExercisesRepository {
+public class ExercisesRepository implements CrudRepository<Exercise, String> {
     private final CrudRepositoryBehavior<Exercise, ExerciseRecord, String> crud;
 
     public ExercisesRepository(DSLContext dslContext) {

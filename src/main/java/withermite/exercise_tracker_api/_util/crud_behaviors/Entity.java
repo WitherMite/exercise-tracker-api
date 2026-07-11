@@ -1,5 +1,7 @@
 package withermite.exercise_tracker_api._util.crud_behaviors;
 
-public interface Entity<T> {
-    public T fetchKeyValue();
+import java.util.Map;
+
+public interface Entity {
+    public Map<String, String> fetchUriKeys();
 }

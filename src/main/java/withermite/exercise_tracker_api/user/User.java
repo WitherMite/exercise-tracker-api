@@ -1,5 +1,7 @@
 package withermite.exercise_tracker_api.user;
 
+import java.util.Map;
+
 import org.jooq.generated.enums.UserRoleEnum;
 
 import jakarta.validation.constraints.NotBlank;
@@ -11,7 +13,7 @@ import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 import withermite.exercise_tracker_api._util.validation.constraints.IsEnumType;
 import withermite.exercise_tracker_api._util.validation.constraints.NotBlankIfExists;
 
-public class User implements Entity<String> {
+public class User implements Entity {
     @NotBlank(message = "Username must not be blank", groups = Full.class)
     @NotBlankIfExists(message = "Username must not be blank", groups = AsDelta.class)
     public String username;
@@ -29,7 +31,7 @@ public class User implements Entity<String> {
     public Boolean areWorkoutsPublic;
 
     @Override
-    public String fetchKeyValue() {
-        return username;
+    public Map<String, String> fetchUriKeys() {
+        return Map.of("key", username);
     }
 }

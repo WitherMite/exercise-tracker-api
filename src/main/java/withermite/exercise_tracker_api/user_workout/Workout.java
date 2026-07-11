@@ -2,6 +2,7 @@ package withermite.exercise_tracker_api.user_workout;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.PastOrPresent;
@@ -10,7 +11,7 @@ import withermite.exercise_tracker_api._util.crud_behaviors.Entity;
 import withermite.exercise_tracker_api.exercise.Exercise;
 import withermite.exercise_tracker_api.user.User;
 
-public class Workout implements Entity<Long> {
+public class Workout implements Entity {
     @Positive
     public Long id;
 
@@ -35,7 +36,7 @@ public class Workout implements Entity<Long> {
     }
 
     @Override
-    public Long fetchKeyValue() {
-        return id;
+    public Map<String, String> fetchUriKeys() {
+        return Map.of("key", id.toString());
     }
 }

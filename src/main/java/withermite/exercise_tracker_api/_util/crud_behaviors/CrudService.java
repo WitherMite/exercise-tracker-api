@@ -4,7 +4,7 @@ import java.util.List;
 
 import withermite.exercise_tracker_api._util.ResourceWrapper;
 
-public interface CrudService<E extends Entity<?>> {
+public interface CrudService<E> {
     public E create(E entity);
 
     public E findOne(String key);
