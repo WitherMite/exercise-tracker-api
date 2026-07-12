@@ -2,29 +2,329 @@
     "testName": "Workout Tests",
     "resourceUri": "/users/frank/workouts",
     "populateSqlPath": "testsql/user_workout/populate-workout.sql",
-    "dbTableName": "user_exercises",
-    "dbKeyRowName": "",
+    "dbTableName": "user_workout",
+    "dbKeyRowName": "id",
     "testData": {
-        "optionalFields": [],
-        "dbRowToFieldMapping": {},
+        "optionalFields": [
+            "datetime",
+            "count",
+            "notes",
+            "subjectiveEffortType"
+        ],
+        "dbRowToFieldMapping": {
+            "id": "id",
+            "datetime": "datetime",
+            "notes": "notes",
+            "workout_count": "count",
+            "subjective_effort_type": "subjectiveEffortType"
+        },
         "defaultValues": {
-            "entity": {},
-            "database": {}
+            "entity": {
+                "datetime": "now",
+                "count": 1,
+                "notes": null,
+                "subjectiveEffortType": "CR-10"
+            },
+            "database": {
+                "datetime": "now",
+                "workout_count": 1,
+                "notes": null,
+                "subjective_effort_type": "CR-10"
+            }
         },
         "entityExisting": {
-            "keyValue": "",
-            "original": {},
-            "alternateValues": {},
-            "dbStateOriginal": {},
-            "dbStateAlternate": {}
+            "keyValue": 1,
+            "original": {
+                "id": 1,
+                "exercise": {
+                    "name": "Road run",
+                    "description": "An easy training run around the streets",
+                    "exerciseType": {
+                        "name": "Distance run",
+                        "countType": "single",
+                        "workTimeType": "time",
+                        "loadType": "distance",
+                        "restType": "optional"
+                    }
+                },
+                "datetime": "now",
+                "notes": "Saw a cool rock",
+                "count": 1,
+                "subjectiveEffortType": "CR-10",
+                "statistics": [
+                    {
+                        "load": 8.2,
+                        "workTime": 2700000,
+                        "restLength": null,
+                        "subjectiveEffortValue": 6
+                    }
+                ]
+            },
+            "alternateValues": {
+                "id": 1,
+                "exercise": {
+                    "name": "Road run",
+                    "description": "An easy training run around the streets",
+                    "exerciseType": {
+                        "name": "Distance run",
+                        "countType": "single",
+                        "workTimeType": "time",
+                        "loadType": "distance",
+                        "restType": "optional"
+                    }
+                },
+                "datetime": "<a different valid datetime>",
+                "notes": "Went a little overboard",
+                "count": 1,
+                "subjectiveEffortType": "Borg",
+                "statistics": [
+                    {
+                        "load": 10,
+                        "workTime": 2820000,
+                        "restLength": null,
+                        "subjectiveEffortValue": 17
+                    }
+                ]
+            },
+            "dbStateOriginal": {
+                "id": 1,
+                "datetime": "now",
+                "notes": "Saw a cool rock",
+                "workout_count": 1,
+                "subjective_effort_type": "CR-10"
+            },
+            "dbStateAlternate": {
+                "id": 1,
+                "datetime": "<a different valid datetime>",
+                "notes": "Went a little overboard",
+                "workout_count": 1,
+                "subjective_effort_type": "Borg"
+            }
         },
         "entityUnique": {
-            "keyValue": "",
-            "original": {},
-            "alternateValues": {},
-            "dbStateOriginal": {},
-            "dbStateAlternate": {}
+            "keyValue": 6,
+            "original": {
+                "id": 6,
+                "exercise": {
+                    "name": "Bench press",
+                    "description": "Lying on a bench, press a barbell up",
+                    "exerciseType": {
+                        "name": "Weightlifting",
+                        "countType": "set",
+                        "workTimeType": "repetition",
+                        "loadType": "weight",
+                        "restType": "afterCount"
+                    }
+                },
+                "datetime": "now",
+                "notes": "Repped 2 plates!",
+                "count": 3,
+                "subjectiveEffortType": "CR-10",
+                "statistics": [
+                    {
+                        "load": 102,
+                        "workTime": 5,
+                        "restLength": 300000,
+                        "subjectiveEffortValue": 7
+                    },
+                    {
+                        "load": 102,
+                        "workTime": 5,
+                        "restLength": 300000,
+                        "subjectiveEffortValue": 8
+                    },
+                    {
+                        "load": 102,
+                        "workTime": 5,
+                        "restLength": null,
+                        "subjectiveEffortValue": 9
+                    }
+                ]
+            },
+            "alternateValues": {
+                "id": 6,
+                "exercise": {
+                    "name": "Bench press",
+                    "description": "Lying on a bench, press a barbell up",
+                    "exerciseType": {
+                        "name": "Weightlifting",
+                        "countType": "set",
+                        "workTimeType": "repetition",
+                        "loadType": "weight",
+                        "restType": "afterCount"
+                    }
+                },
+                "datetime": "<a different valid datetime>",
+                "notes": "Tried to rep 2 plates...",
+                "count": 3,
+                "subjectiveEffortType": "CR-10",
+                "statistics": [
+                    {
+                        "load": 102,
+                        "workTime": 5,
+                        "restLength": 300000,
+                        "subjectiveEffortValue": 8
+                    },
+                    {
+                        "load": 102,
+                        "workTime": 5,
+                        "restLength": 420000,
+                        "subjectiveEffortValue": 9
+                    },
+                    {
+                        "load": 102,
+                        "workTime": 3,
+                        "restLength": null,
+                        "subjectiveEffortValue": 10
+                    }
+                ]
+            },
+            "dbStateOriginal": {
+                "id": 6,
+                "datetime": "now",
+                "notes": "Repped 2 plates!",
+                "workout_count": 3,
+                "subjective_effort_type": "CR-10"
+            },
+            "dbStateAlternate": {
+                "id": 6,
+                "datetime": "<a different valid datetime>",
+                "notes": "Tried to rep 2 plates...",
+                "workout_count": 3,
+                "subjective_effort_type": "CR-10"
+            }
         },
-        "defaultFullPageResponse": []
+        "defaultFullPageResponse": [
+            {
+                "id": 1,
+                "exercise": {
+                    "name": "Road run",
+                    "description": "An easy training run around the streets",
+                    "exerciseType": {
+                        "name": "Distance run",
+                        "countType": "single",
+                        "workTimeType": "time",
+                        "loadType": "distance",
+                        "restType": "optional"
+                    }
+                },
+                "datetime": "",
+                "notes": "Saw a cool rock",
+                "count": 1,
+                "subjectiveEffortType": "CR-10",
+                "statistics": [
+                    {
+                        "load": 8.2,
+                        "workTime": 2700000,
+                        "restLength": null,
+                        "subjectiveEffortValue": 6
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "exercise": {
+                    "name": "Road run",
+                    "description": "An easy training run around the streets",
+                    "exerciseType": {
+                        "name": "Distance run",
+                        "countType": "single",
+                        "workTimeType": "time",
+                        "loadType": "distance",
+                        "restType": "optional"
+                    }
+                },
+                "datetime": "",
+                "notes": "Saw a cool rock",
+                "count": 1,
+                "subjectiveEffortType": "CR-10",
+                "statistics": [
+                    {
+                        "load": 8.2,
+                        "workTime": 2700000,
+                        "restLength": null,
+                        "subjectiveEffortValue": 6
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "exercise": {
+                    "name": "Road run",
+                    "description": "An easy training run around the streets",
+                    "exerciseType": {
+                        "name": "Distance run",
+                        "countType": "single",
+                        "workTimeType": "time",
+                        "loadType": "distance",
+                        "restType": "optional"
+                    }
+                },
+                "datetime": "",
+                "notes": "Saw a cool rock",
+                "count": 1,
+                "subjectiveEffortType": "CR-10",
+                "statistics": [
+                    {
+                        "load": 8.2,
+                        "workTime": 2700000,
+                        "restLength": null,
+                        "subjectiveEffortValue": 6
+                    }
+                ]
+            },
+            {
+                "id": 4,
+                "exercise": {
+                    "name": "Road run",
+                    "description": "An easy training run around the streets",
+                    "exerciseType": {
+                        "name": "Distance run",
+                        "countType": "single",
+                        "workTimeType": "time",
+                        "loadType": "distance",
+                        "restType": "optional"
+                    }
+                },
+                "datetime": "",
+                "notes": "Saw a cool rock",
+                "count": 1,
+                "subjectiveEffortType": "CR-10",
+                "statistics": [
+                    {
+                        "load": 8.2,
+                        "workTime": 2700000,
+                        "restLength": null,
+                        "subjectiveEffortValue": 6
+                    }
+                ]
+            },
+            {
+                "id": 5,
+                "exercise": {
+                    "name": "Road run",
+                    "description": "An easy training run around the streets",
+                    "exerciseType": {
+                        "name": "Distance run",
+                        "countType": "single",
+                        "workTimeType": "time",
+                        "loadType": "distance",
+                        "restType": "optional"
+                    }
+                },
+                "datetime": "",
+                "notes": "Saw a cool rock",
+                "count": 1,
+                "subjectiveEffortType": "CR-10",
+                "statistics": [
+                    {
+                        "load": 8.2,
+                        "workTime": 2700000,
+                        "restLength": null,
+                        "subjectiveEffortValue": 6
+                    }
+                ]
+            }
+        ]
     }
 }

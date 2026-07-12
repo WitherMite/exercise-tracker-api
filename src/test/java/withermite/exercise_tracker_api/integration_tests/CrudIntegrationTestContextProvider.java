@@ -15,6 +15,7 @@ import withermite.exercise_tracker_api.exercise_type.ExerciseTypeCrudTestsConfig
 import withermite.exercise_tracker_api.test_util.CrudIntegrationTestContext;
 import withermite.exercise_tracker_api.test_util.CrudIntegrationTestsConfig;
 import withermite.exercise_tracker_api.user.UserCrudTestsConfig;
+import withermite.exercise_tracker_api.user_workout.WorkoutCrudTestsConfig;
 
 public class CrudIntegrationTestContextProvider implements ClassTemplateInvocationContextProvider {
     // list config sources here
@@ -22,8 +23,8 @@ public class CrudIntegrationTestContextProvider implements ClassTemplateInvocati
     private final CrudIntegrationTestsConfig[] configSources = {
             new UserCrudTestsConfig(),
             new ExerciseTypeCrudTestsConfig(),
-            new ExerciseCrudTestsConfig()
-            // ,new WorkoutCrudTestsConfig()
+            new ExerciseCrudTestsConfig(),
+            new WorkoutCrudTestsConfig()
     };
 
     private final CrudIntegrationTestContext[] configs;

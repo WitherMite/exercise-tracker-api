@@ -19,6 +19,10 @@ public class CrudTestData {
         if (node.isNull())
             return null;
 
+        if (type == null) {
+            throw new RuntimeException("Node missing type:" + node.toPrettyString());
+        }
+
         return switch (type.getSimpleName()) {
             case "String" -> node.asString();
             case "Boolean" -> node.asBoolean();

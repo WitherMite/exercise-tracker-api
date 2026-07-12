@@ -1,6 +1,6 @@
 BEGIN;
 
-DROP TABLE IF EXISTS app_user, exercise_type, exercise, user_exercise, user_exercise_statistic;
+DROP TABLE IF EXISTS app_user, exercise_type, exercise, user_workout, user_workout_statistic;
 DROP TYPE IF EXISTS user_role_enum, count_type_enum, work_time_type_enum, load_type_enum, rest_type_enum, subjective_effort_type_enum;
 
 CREATE TYPE user_role_enum AS ENUM ('default', 'admin');
@@ -36,26 +36,26 @@ CREATE TABLE exercise (
     description      text
 );
 
-CREATE TABLE user_exercise (
-    id             int       GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id        int       REFERENCES app_user ON DELETE CASCADE NOT NULL,
-    exercise_id    int       REFERENCES exercise ON DELETE RESTRICT NOT NULL,
-    datetime       timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    exercise_count smallint  DEFAULT 1 NOT NULL,
-    notes          text
-);
-
 CREATE TYPE subjective_effort_type_enum AS ENUM ('CR-10', 'Borg');
 
-CREATE TABLE user_exercise_statistic (
-    user_exercise_id        int                         REFERENCES user_exercise ON DELETE CASCADE NOT NULL,
+CREATE TABLE user_workout (
+    id                      int                         GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id                 int                         REFERENCES app_user ON DELETE CASCADE NOT NULL,
+    exercise_id             int                         REFERENCES exercise ON DELETE RESTRICT NOT NULL,
+    datetime                timestamp                   DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    workout_count           smallint                    DEFAULT 1 NOT NULL,
+    notes                   text,
+    subjective_effort_type  subjective_effort_type_enum DEFAULT 'CR-10' NOT NULL
+);
+
+CREATE TABLE user_workout_statistic (
+    user_workout_id         int                         REFERENCES user_workout ON DELETE CASCADE NOT NULL,
     index                   smallint                    NOT NULL,
     work_time               double precision,
     load                    double precision,
     rest_length             interval,
-    subjective_effort_type  subjective_effort_type_enum DEFAULT 'CR-10' NOT NULL,
     subjective_effort_value double precision,
-    PRIMARY KEY (user_exercise_id, index)
+    PRIMARY KEY (user_workout_id, index)
 );
 
 COMMIT;

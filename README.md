@@ -6,6 +6,8 @@
     - global (controller advice) and controller handler method error handlers
         - test for problem detail shape
 - Add other endpoints
+    - find out how to test time values in json and db
+    - add an option to skip tests for changing resource keys when that isnt allowed
     - test moving exercises to other exercise types, disallow this for user workouts
     - test changing children for coupled 1:many relationships (like lists of workout statistics)
 - Implement security
