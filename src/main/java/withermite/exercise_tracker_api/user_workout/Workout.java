@@ -16,7 +16,7 @@ import withermite.exercise_tracker_api.exercise.Exercise;
 
 public class Workout implements Entity {
     @Positive
-    public Long id;
+    public Integer id;
 
     public Exercise exercise;
 
@@ -26,7 +26,7 @@ public class Workout implements Entity {
     public String notes;
 
     @Positive
-    public Integer count;
+    public Short count;
 
     @IsEnumType(enumTypeClass = SubjectiveEffortTypeEnum.class, message = "Subjective effort type must be a valid subjective effort type")
     public String subjectiveEffortType;

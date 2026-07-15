@@ -12,5 +12,5 @@ public class WorkoutStatistic {
 
     @Min(0)
     @Max(20)
-    public Float subjectiveEffortValue;
+    public Double subjectiveEffortValue;
 }

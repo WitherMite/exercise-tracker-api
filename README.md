@@ -11,3 +11,5 @@
     - test moving exercises to other exercise types, disallow this for user workouts
     - test changing children for coupled 1:many relationships (like lists of workout statistics)
 - Implement security
+
+- someday eager load nested results instead of navigating relations and generating extra queries

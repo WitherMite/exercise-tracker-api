@@ -1,6 +1,7 @@
 package withermite.exercise_tracker_api.integration_tests;
 
 import java.net.URI;
+import java.util.Optional;
 
 import javax.sql.DataSource;
 
@@ -434,6 +435,9 @@ public class CrudIntegrationTests {
 
             int rowsAfter = countRowsInTable(jdbc, tableName);
             assertEquals(rowsBefore - 1, rowsAfter);
+
+            Optional<Object> result = jdbc.sql(sqlSelectExisting()).query().optionalValue();
+            assertEquals(true, result.isEmpty());
         }
 
         // Error tests

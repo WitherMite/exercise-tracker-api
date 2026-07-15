@@ -124,13 +124,13 @@
                     {
                         "load": 102,
                         "workTime": 5,
-                        "restLength": 300000,
+                        "restLength": "5 minutes",
                         "subjectiveEffortValue": 7
                     },
                     {
                         "load": 102,
                         "workTime": 5,
-                        "restLength": 300000,
+                        "restLength": "5 minutes",
                         "subjectiveEffortValue": 8
                     },
                     {
@@ -162,13 +162,13 @@
                     {
                         "load": 102,
                         "workTime": 5,
-                        "restLength": 300000,
+                        "restLength": "5 minutes",
                         "subjectiveEffortValue": 8
                     },
                     {
                         "load": 102,
                         "workTime": 5,
-                        "restLength": 420000,
+                        "restLength": "6 minutes",
                         "subjectiveEffortValue": 9
                     },
                     {

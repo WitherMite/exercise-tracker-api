@@ -28,12 +28,14 @@ public class CrudRepositoryBehavior<E, R extends UpdatableRecord<R>, T> implemen
         this.unmapper = unmapper;
     }
 
+    @Override
     public E save(E entity) {
         R record = create.newRecord(table, entity);
         record.store();
         return record.into(entityType);
     }
 
+    @Override
     public E getOne(T key) {
         R record = create.fetchOne(
                 table, tableKey.eq(key));
@@ -44,11 +46,13 @@ public class CrudRepositoryBehavior<E, R extends UpdatableRecord<R>, T> implemen
         return record.into(entityType);
     }
 
+    @Override
     public List<E> getMany(int pageSize, int offset) {
         List<E> entities = create.selectFrom(table).limit(pageSize).offset(offset).fetchInto(entityType);
         return entities;
     }
 
+    @Override
     public E update(T key, E entity) {
         R record = create.fetchOne(
                 table, tableKey.eq(key));
@@ -61,6 +65,7 @@ public class CrudRepositoryBehavior<E, R extends UpdatableRecord<R>, T> implemen
         return record.into(entityType);
     }
 
+    @Override
     public ResourceWrapper<E> replace(T key, E entity) {
         // try to get from db
         R record = create.fetchOne(
@@ -76,6 +81,7 @@ public class CrudRepositoryBehavior<E, R extends UpdatableRecord<R>, T> implemen
         return new ResourceWrapper<>(save(entity), true);
     }
 
+    @Override
     public void delete(T key) {
         R record = create.fetchOne(
                 table, tableKey.eq(key));

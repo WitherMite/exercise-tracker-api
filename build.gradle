@@ -56,6 +56,12 @@ jooq {
                 name = "org.jooq.meta.postgres.PostgresDatabase"
                 includes = ".*"
                 inputSchema = "public"
+                forcedTypes {
+                    forcedType {
+                        name = "INSTANT"
+                        includeTypes = '(?i)timestamp\\ with\\ time\\ zone|timestamptz'
+                    }
+                }
             }
             // Generation flags: See advanced configuration properties
             generate {
