@@ -15,6 +15,7 @@ import withermite.exercise_tracker_api._util.crud_behaviors.Entity;
 import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 import withermite.exercise_tracker_api._util.validation.constraints.IsEnumType;
 import withermite.exercise_tracker_api.exercise.Exercise;
+import withermite.exercise_tracker_api.user.User;
 
 public class Workout implements Entity {
     @Positive
@@ -22,6 +23,8 @@ public class Workout implements Entity {
     public Integer id;
 
     public Exercise exercise;
+
+    public User user;
 
     @PastOrPresent
     public Instant datetime;
@@ -45,6 +48,6 @@ public class Workout implements Entity {
 
     @Override
     public Map<String, String> fetchUriKeys() {
-        return Map.of("key", id.toString());
+        return Map.of("key", id.toString(), "user-username", user.username);
     }
 }

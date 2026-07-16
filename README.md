@@ -7,6 +7,7 @@
     - global (controller advice) and controller handler method error handlers
         - test for problem detail shape
 - Add other endpoints
+    - put the username onto user workouts from request uri
     - find out how to test time values in json and db
     - add an option to skip tests for changing resource keys when that isnt allowed
     - test moving exercises to other exercise types, disallow this for user workouts

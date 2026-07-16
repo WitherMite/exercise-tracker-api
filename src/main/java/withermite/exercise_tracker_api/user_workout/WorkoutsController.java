@@ -22,9 +22,9 @@ import withermite.exercise_tracker_api._util.validation.ValidationGroups.AsDelta
 import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 
 @RestController
-@RequestMapping("/users/{username}/workouts")
+@RequestMapping("/users/{user-username}/workouts")
 class WorkoutsController {
-    private final String resourceUri = "/users/{username}/workouts";
+    private final String resourceUri = "/users/{user-username}/workouts";
     private final CrudControllerBehavior<Workout, WorkoutsService> crud;
 
     public WorkoutsController(WorkoutsService workoutsService,
