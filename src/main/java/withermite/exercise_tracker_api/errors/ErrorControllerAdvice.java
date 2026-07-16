@@ -1,41 +1,81 @@
 package withermite.exercise_tracker_api.errors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import tools.jackson.databind.exc.InvalidFormatException;
 
 @RestControllerAdvice
-public class ErrorControllerAdvice extends ResponseEntityExceptionHandler {
+public class ErrorControllerAdvice {
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ProblemDetail handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setDetail("Failed to read request");
+
+        Throwable cause = e.getCause();
+        if (cause instanceof InvalidFormatException invalidFormat) {
+            problem.setDetail("Json body invalid");
+            String message;
+            message = "'"
+                    + invalidFormat.getValue().toString()
+                    + "' is not a valid "
+                    + invalidFormat.getTargetType().getSimpleName();
+            problem.setProperty("errors", new String[] { message });
+        }
+
+        return problem;
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problem.setDetail("Request contains invalid fields");
+
+        var violations = e.getAllErrors();
+        List<String> errors = new ArrayList<>();
+
+        violations.forEach(violation -> {
+            errors.add(violation.getDefaultMessage());
+        });
+
+        problem.setProperty("errors", errors);
+        return problem;
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ProblemDetail> handleNotFound(ResourceNotFoundException e) {
+    public ProblemDetail handleNotFound(ResourceNotFoundException e) {
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
         problem.setDetail(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
+        return problem;
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ProblemDetail> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+    public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException e) {
         if (e instanceof DuplicateKeyException) {
             ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.CONFLICT);
 
             // todo: add information to problem detail
 
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
+            return problem;
         }
 
         return handleUncaught(e);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ProblemDetail> handleUncaught(Exception e) {
+    public ProblemDetail handleUncaught(Exception e) {
         System.err.println(e);
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        return ResponseEntity.internalServerError().body(problem);
+        return problem;
     }
 }

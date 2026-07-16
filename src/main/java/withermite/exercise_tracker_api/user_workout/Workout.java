@@ -8,14 +8,17 @@ import org.jooq.generated.enums.SubjectiveEffortTypeEnum;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import withermite.exercise_tracker_api._util.crud_behaviors.Entity;
+import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 import withermite.exercise_tracker_api._util.validation.constraints.IsEnumType;
 import withermite.exercise_tracker_api.exercise.Exercise;
 
 public class Workout implements Entity {
     @Positive
+    @NotNull(groups = { Full.class }, message = "Workout id must not be null")
     public Integer id;
 
     public Exercise exercise;
