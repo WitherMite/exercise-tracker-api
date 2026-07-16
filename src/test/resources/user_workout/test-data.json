@@ -47,7 +47,7 @@
                         "restType": "optional"
                     }
                 },
-                "datetime": "now",
+                "datetime": "2026-07-15T08:40:17.751209Z",
                 "notes": "Saw a cool rock",
                 "count": 1,
                 "subjectiveEffortType": "CR-10",
@@ -73,7 +73,7 @@
                         "restType": "optional"
                     }
                 },
-                "datetime": "<a different valid datetime>",
+                "datetime": "2023-07-12T07:20:20.5Z",
                 "notes": "Went a little overboard",
                 "count": 1,
                 "subjectiveEffortType": "Borg",
@@ -88,14 +88,14 @@
             },
             "dbStateOriginal": {
                 "id": 1,
-                "datetime": "now",
+                "datetime": "2026-07-15T08:40:17.751209Z",
                 "notes": "Saw a cool rock",
                 "workout_count": 1,
                 "subjective_effort_type": "CR-10"
             },
             "dbStateAlternate": {
                 "id": 1,
-                "datetime": "<a different valid datetime>",
+                "datetime": "2023-07-12T07:20:20.5Z",
                 "notes": "Went a little overboard",
                 "workout_count": 1,
                 "subjective_effort_type": "Borg"
@@ -116,7 +116,7 @@
                         "restType": "afterCount"
                     }
                 },
-                "datetime": "now",
+                "datetime": "2023-07-12T07:20:20.5Z",
                 "notes": "Repped 2 plates!",
                 "count": 3,
                 "subjectiveEffortType": "CR-10",
@@ -154,7 +154,7 @@
                         "restType": "afterCount"
                     }
                 },
-                "datetime": "<a different valid datetime>",
+                "datetime": "2026-05-30T21:00:33.124Z",
                 "notes": "Tried to rep 2 plates...",
                 "count": 3,
                 "subjectiveEffortType": "CR-10",
@@ -181,14 +181,14 @@
             },
             "dbStateOriginal": {
                 "id": 6,
-                "datetime": "now",
+                "datetime": "2023-07-12T07:20:20.5Z",
                 "notes": "Repped 2 plates!",
                 "workout_count": 3,
                 "subjective_effort_type": "CR-10"
             },
             "dbStateAlternate": {
                 "id": 6,
-                "datetime": "<a different valid datetime>",
+                "datetime": "2026-05-30T21:00:33.124Z",
                 "notes": "Tried to rep 2 plates...",
                 "workout_count": 3,
                 "subjective_effort_type": "CR-10"
@@ -208,7 +208,7 @@
                         "restType": "optional"
                     }
                 },
-                "datetime": "",
+                "datetime": "2026-07-15T08:40:17.751209Z",
                 "notes": "Saw a cool rock",
                 "count": 1,
                 "subjectiveEffortType": "CR-10",
@@ -234,7 +234,7 @@
                         "restType": "optional"
                     }
                 },
-                "datetime": "",
+                "datetime": "2026-07-15T08:40:17.751209Z",
                 "notes": "Saw a cool rock",
                 "count": 1,
                 "subjectiveEffortType": "CR-10",
@@ -260,7 +260,7 @@
                         "restType": "optional"
                     }
                 },
-                "datetime": "",
+                "datetime": "2026-07-15T08:40:17.751209Z",
                 "notes": "Saw a cool rock",
                 "count": 1,
                 "subjectiveEffortType": "CR-10",
@@ -286,7 +286,7 @@
                         "restType": "optional"
                     }
                 },
-                "datetime": "",
+                "datetime": "2026-07-15T08:40:17.751209Z",
                 "notes": "Saw a cool rock",
                 "count": 1,
                 "subjectiveEffortType": "CR-10",
@@ -312,7 +312,7 @@
                         "restType": "optional"
                     }
                 },
-                "datetime": "",
+                "datetime": "2026-07-15T08:40:17.751209Z",
                 "notes": "Saw a cool rock",
                 "count": 1,
                 "subjectiveEffortType": "CR-10",

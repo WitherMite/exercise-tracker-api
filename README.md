@@ -13,3 +13,4 @@
 - Implement security
 
 - someday eager load nested results instead of navigating relations and generating extra queries
+    - dynamically build queries instead of grabbing updatable records (is a big change for little effect though, so not priority)
