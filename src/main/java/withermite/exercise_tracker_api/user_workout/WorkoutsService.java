@@ -16,8 +16,11 @@ public class WorkoutsService implements CrudService<Workout> {
     }
 
     @Override
-    public Workout create(Workout entity) {
-        return workoutsRepository.save(entity);
+    public Workout create(Workout workout) {
+        if (workout.count == null) {
+            workout.count = ((short) workout.statistics.size());
+        }
+        return workoutsRepository.save(workout);
     }
 
     @Override
@@ -32,15 +35,15 @@ public class WorkoutsService implements CrudService<Workout> {
     }
 
     @Override
-    public ResourceWrapper<Workout> replace(String key, Workout entity) {
+    public ResourceWrapper<Workout> replace(String key, Workout workout) {
         Integer intKey = Integer.valueOf(key);
-        return workoutsRepository.replace(intKey, entity);
+        return workoutsRepository.replace(intKey, workout);
     }
 
     @Override
-    public Workout update(String key, Workout entity) {
+    public Workout update(String key, Workout workout) {
         Integer intKey = Integer.valueOf(key);
-        return workoutsRepository.update(intKey, entity);
+        return workoutsRepository.update(intKey, workout);
     }
 
     @Override

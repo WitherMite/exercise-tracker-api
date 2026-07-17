@@ -2,6 +2,8 @@ package withermite.exercise_tracker_api.test_util.data_structures;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,6 +29,11 @@ public class DataGroup {
 
         expectedDbRowState.forEach((columnName, expected) -> {
             try {
+                if (expected.type().equals(Instant.class)) {
+                    OffsetDateTime result = rs.getObject(columnName, OffsetDateTime.class);
+                    assertEquals(expected.value(), result.toInstant());
+                    return;
+                }
                 assertEquals(expected.value(), rs.getObject(columnName, expected.type()));
             } catch (SQLException e) {
                 fail(e);

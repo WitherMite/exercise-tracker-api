@@ -42,7 +42,7 @@ CREATE TABLE user_workout (
     id                      int                         GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     user_id                 int                         REFERENCES app_user ON DELETE CASCADE NOT NULL,
     exercise_id             int                         REFERENCES exercise ON DELETE RESTRICT NOT NULL,
-    datetime                timestamptz                   DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    datetime                timestamptz                 DEFAULT CURRENT_TIMESTAMP NOT NULL,
     workout_count           smallint                    DEFAULT 1 NOT NULL,
     notes                   text,
     subjective_effort_type  subjective_effort_type_enum DEFAULT 'CR-10' NOT NULL

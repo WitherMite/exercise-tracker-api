@@ -5,29 +5,19 @@
     "dbTableName": "user_workout",
     "dbKeyRowName": "id",
     "testData": {
-        "optionalFields": [
-            "datetime",
-            "count",
-            "notes",
-            "subjectiveEffortType"
-        ],
+        "optionalFields": ["notes", "subjectiveEffortType"],
         "dbRowToFieldMapping": {
             "id": "id",
             "datetime": "datetime",
             "notes": "notes",
-            "workout_count": "count",
             "subjective_effort_type": "subjectiveEffortType"
         },
         "defaultValues": {
             "entity": {
-                "datetime": "now",
-                "count": 1,
                 "notes": null,
                 "subjectiveEffortType": "CR-10"
             },
             "database": {
-                "datetime": "now",
-                "workout_count": 1,
                 "notes": null,
                 "subjective_effort_type": "CR-10"
             }
@@ -73,7 +63,7 @@
                         "restType": "optional"
                     }
                 },
-                "datetime": "2023-07-12T07:20:20.5Z",
+                "datetime": "2023-07-12T07:20:20.500Z",
                 "notes": "Went a little overboard",
                 "count": 1,
                 "subjectiveEffortType": "Borg",
@@ -95,7 +85,7 @@
             },
             "dbStateAlternate": {
                 "id": 1,
-                "datetime": "2023-07-12T07:20:20.5Z",
+                "datetime": "2023-07-12T07:20:20.500Z",
                 "notes": "Went a little overboard",
                 "workout_count": 1,
                 "subjective_effort_type": "Borg"
@@ -116,28 +106,28 @@
                         "restType": "afterCount"
                     }
                 },
-                "datetime": "2023-07-12T07:20:20.5Z",
+                "datetime": "2023-07-12T07:20:20.500Z",
                 "notes": "Repped 2 plates!",
                 "count": 3,
                 "subjectiveEffortType": "CR-10",
                 "statistics": [
                     {
                         "load": 102,
-                        "workTime": 5,
+                        "workTime": 5.0,
                         "restLength": "PT5M",
-                        "subjectiveEffortValue": 7
+                        "subjectiveEffortValue": 7.0
                     },
                     {
                         "load": 102,
-                        "workTime": 5,
+                        "workTime": 5.0,
                         "restLength": "PT5M",
-                        "subjectiveEffortValue": 8
+                        "subjectiveEffortValue": 8.0
                     },
                     {
                         "load": 102,
-                        "workTime": 5,
+                        "workTime": 5.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 9
+                        "subjectiveEffortValue": 9.0
                     }
                 ]
             },
@@ -181,7 +171,7 @@
             },
             "dbStateOriginal": {
                 "id": 6,
-                "datetime": "2023-07-12T07:20:20.5Z",
+                "datetime": "2023-07-12T07:20:20.500Z",
                 "notes": "Repped 2 plates!",
                 "workout_count": 3,
                 "subjective_effort_type": "CR-10"

@@ -19,14 +19,14 @@ public class ErrorControllerAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ProblemDetail handleHttpMessageNotReadable(HttpMessageNotReadableException e) {
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problem.setDetail("Failed to read request");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Failed to read request");
 
         Throwable cause = e.getCause();
         if (cause instanceof InvalidFormatException invalidFormat) {
             problem.setDetail("Json body invalid");
-            String message;
-            message = "'"
+            String message = "'"
                     + invalidFormat.getValue().toString()
                     + "' is not a valid "
                     + invalidFormat.getTargetType().getSimpleName();
@@ -38,8 +38,9 @@ public class ErrorControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problem.setDetail("Request contains invalid fields");
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "Request contains invalid fields");
 
         var violations = e.getAllErrors();
         List<String> errors = new ArrayList<>();
@@ -54,8 +55,9 @@ public class ErrorControllerAdvice {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ProblemDetail handleNotFound(ResourceNotFoundException e) {
-        ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-        problem.setDetail(e.getMessage());
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                e.getMessage());
         return problem;
     }
 

@@ -14,11 +14,11 @@ public class WorkoutCrudTestsConfig implements CrudIntegrationTestsConfig {
     @Override
     public Map<String, Class<?>> getDbRowMapToTypeMap() {
         return Map.of(
-                "id", Long.class,
-                "user_id", Long.class,
-                "exercise_id", Long.class,
+                "id", Integer.class,
+                "user_id", Integer.class,
+                "exercise_id", Integer.class,
                 "datetime", Instant.class,
-                "workout_count", Integer.class,
+                "workout_count", Short.class,
                 "subjective_effort_type", String.class,
                 "notes", String.class);
     }

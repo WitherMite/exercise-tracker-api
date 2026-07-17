@@ -22,9 +22,9 @@ import withermite.exercise_tracker_api._util.validation.ValidationGroups.AsDelta
 import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 
 @RestController
-@RequestMapping("/users/{user-username}/workouts")
+@RequestMapping("/users/{userUsername}/workouts")
 class WorkoutsController {
-    private final String resourceUri = "/users/{user-username}/workouts";
+    private final String resourceUri = "/users/{userUsername}/workouts";
     private final CrudControllerBehavior<Workout, WorkoutsService> crud;
 
     public WorkoutsController(WorkoutsService workoutsService,
@@ -38,8 +38,12 @@ class WorkoutsController {
     }
 
     @PostMapping
-    public ResponseEntity<Workout> create(@Validated(Full.class) @RequestBody Workout exerciseType) {
-        return crud.create(exerciseType);
+    public ResponseEntity<Workout> create(
+            @PathVariable String userUsername,
+            @RequestBody @Validated(Full.class) Workout workout) {
+
+        workout.userUsername = userUsername;
+        return crud.create(workout);
     }
 
     @GetMapping("/{key}")
@@ -48,15 +52,23 @@ class WorkoutsController {
     }
 
     @PutMapping("/{key}")
-    public ResponseEntity<Workout> replace(@PathVariable String key,
-            @Validated(Full.class) @RequestBody @Valid Workout exerciseType) {
-        return crud.replace(key, exerciseType);
+    public ResponseEntity<Workout> replace(
+            @PathVariable String key,
+            @PathVariable String userUsername,
+            @RequestBody @Validated(Full.class) Workout workout) {
+
+        workout.userUsername = userUsername;
+        return crud.replace(key, workout);
     }
 
     @PatchMapping("/{key}")
-    public ResponseEntity<Workout> update(@PathVariable String key,
-            @Validated(AsDelta.class) @RequestBody Workout exerciseType) {
-        return crud.update(key, exerciseType);
+    public ResponseEntity<Workout> update(
+            @PathVariable String key,
+            @PathVariable String userUsername,
+            @RequestBody @Validated(AsDelta.class) Workout workout) {
+
+        workout.userUsername = userUsername;
+        return crud.update(key, workout);
     }
 
     @DeleteMapping("/{key}")

@@ -1,5 +1,6 @@
 package withermite.exercise_tracker_api.test_util.data_structures;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ public class CrudTestData {
             case "Double" -> node.asDouble();
             case "BigInteger" -> node.asBigInteger();
             case "BigDecimal" -> node.asDecimal();
+            case "Instant" -> Instant.parse(node.asString());
             default -> node;
         };
     }
