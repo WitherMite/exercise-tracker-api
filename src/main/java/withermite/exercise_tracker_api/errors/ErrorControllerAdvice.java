@@ -77,6 +77,8 @@ public class ErrorControllerAdvice {
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUncaught(Exception e) {
         System.err.println(e);
+        // System.err.println(e.getCause());
+        // e.printStackTrace();
         ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         return problem;
     }

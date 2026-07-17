@@ -16,10 +16,12 @@ import withermite.exercise_tracker_api._util.crud_behaviors.CrudRepositoryBehavi
 @Repository
 public class WorkoutsRepository implements CrudRepository<Workout, Integer> {
     private final DSLContext create;
+    private final WorkoutStatisticUnmapper statUnmapper;
     private final CrudRepositoryBehavior<Workout, UserWorkoutRecord, Integer> crud;
 
     public WorkoutsRepository(DSLContext dslContext) {
         this.create = dslContext;
+        this.statUnmapper = new WorkoutStatisticUnmapper(dslContext);
         this.crud = new CrudRepositoryBehavior<>(
                 dslContext, USER_WORKOUT, USER_WORKOUT.ID,
                 Workout.class, new WorkoutUnmapper(dslContext));
@@ -29,9 +31,12 @@ public class WorkoutsRepository implements CrudRepository<Workout, Integer> {
     public Workout save(Workout workout) {
         Workout workoutResult = crud.save(workout);
 
+        if (workout.count == 0) {
+            return workoutResult;
+        }
         for (short i = 0; i < workout.statistics.size(); i++) {
             WorkoutStatistic stat = workout.statistics.get(i);
-            stat.workoutId = workoutResult.id;
+            stat.workoutId = workoutResult.getId();
             stat.index = i;
 
             UserWorkoutStatisticRecord statRecord = create.newRecord(USER_WORKOUT_STATISTIC, stat);
@@ -56,12 +61,68 @@ public class WorkoutsRepository implements CrudRepository<Workout, Integer> {
 
     @Override
     public Workout update(Integer key, Workout workout) {
-        return crud.update(key, workout);
+        Workout workoutResult = crud.update(key, workout);
+
+        for (short i = 0; i < workout.statistics.size(); i++) {
+            WorkoutStatistic stat = workout.statistics.get(i);
+            // dont change if no provided difference
+            if (stat == null)
+                continue;
+
+            stat.workoutId = workoutResult.getId();
+            stat.index = i;
+
+            UserWorkoutStatisticRecord statRecord = create.fetchOne(
+                    USER_WORKOUT_STATISTIC,
+                    USER_WORKOUT_STATISTIC.USER_WORKOUT_ID.eq(stat.workoutId)
+                            .and(USER_WORKOUT_STATISTIC.INDEX.eq(stat.index)));
+            if (statRecord == null)
+                continue;
+
+            statRecord.update();
+            workoutResult.statistics.add(
+                    statRecord.getIndex(),
+                    statRecord.into(WorkoutStatistic.class));
+        }
+
+        return workoutResult;
     }
 
     @Override
     public ResourceWrapper<Workout> replace(Integer key, Workout workout) {
-        return crud.replace(key, workout);
+
+        ResourceWrapper<Workout> workoutResult = crud.replace(key, workout);
+
+        for (short i = 0; i < workout.statistics.size(); i++) {
+            WorkoutStatistic stat = workout.statistics.get(i);
+            if (stat == null) {
+                create.deleteFrom(USER_WORKOUT_STATISTIC)
+                        .where(USER_WORKOUT_STATISTIC.USER_WORKOUT_ID.eq(workoutResult.resource.getId())
+                                .and(USER_WORKOUT_STATISTIC.INDEX.eq(i)))
+                        .execute();
+                continue;
+            }
+
+            stat.workoutId = workoutResult.resource.getId();
+            stat.index = i;
+
+            UserWorkoutStatisticRecord statRecord = create.fetchOne(
+                    USER_WORKOUT_STATISTIC,
+                    USER_WORKOUT_STATISTIC.USER_WORKOUT_ID.eq(stat.workoutId)
+                            .and(USER_WORKOUT_STATISTIC.INDEX.eq(stat.index)));
+
+            if (statRecord == null) {
+                statRecord = create.newRecord(USER_WORKOUT_STATISTIC, stat);
+                statRecord.store();
+            } else {
+                statRecord.update();
+            }
+
+            statUnmapper.unmapDiff(stat, statRecord);
+            workoutResult.resource.statistics.add(i, stat);
+        }
+
+        return workoutResult;
     }
 
     @Override

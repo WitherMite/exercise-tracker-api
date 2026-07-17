@@ -25,7 +25,7 @@ import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 @RequestMapping("/exercise-types/{exercise-type-name}/exercises")
 class ExercisesController {
     private final String resourceUri = "/exercise-types/{exercise-type-name}/exercises";
-    private final CrudControllerBehavior<Exercise, ExercisesService> crud;
+    private final CrudControllerBehavior<Exercise, ExercisesService, String> crud;
 
     public ExercisesController(ExercisesService exercisesService,
             @Value("${exercise.defaultPageSize}") int defaultPageSize) {

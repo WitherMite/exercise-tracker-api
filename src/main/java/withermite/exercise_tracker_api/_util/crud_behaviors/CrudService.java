@@ -4,16 +4,16 @@ import java.util.List;
 
 import withermite.exercise_tracker_api._util.ResourceWrapper;
 
-public interface CrudService<E> {
+public interface CrudService<E, T> {
     public E create(E entity);
 
-    public E findOne(String key);
+    public E findOne(T key);
 
     public List<E> findMany(int pageSize, int offset);
 
-    public ResourceWrapper<E> replace(String key, E entity);
+    public ResourceWrapper<E> replace(T key, E entity);
 
-    public E update(String key, E entity);
+    public E update(T key, E entity);
 
-    public void delete(String key);
+    public void delete(T key);
 }

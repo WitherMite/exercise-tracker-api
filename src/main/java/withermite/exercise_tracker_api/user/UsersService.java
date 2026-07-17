@@ -8,7 +8,7 @@ import withermite.exercise_tracker_api._util.ResourceWrapper;
 import withermite.exercise_tracker_api._util.crud_behaviors.CrudService;
 
 @Service
-public class UsersService implements CrudService<User> {
+public class UsersService implements CrudService<User, String> {
     private final UsersRepository usersRepository;
 
     public UsersService(UsersRepository userRepository) {

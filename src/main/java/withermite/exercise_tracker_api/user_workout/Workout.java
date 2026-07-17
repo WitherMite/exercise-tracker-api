@@ -13,7 +13,6 @@ import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import withermite.exercise_tracker_api._util.crud_behaviors.Entity;
-import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 import withermite.exercise_tracker_api._util.validation.constraints.IsEnumType;
 import withermite.exercise_tracker_api.exercise.Exercise;
 
@@ -21,9 +20,9 @@ public class Workout implements Entity {
     @Null // manually added from uri / authed user / db
     String userUsername;
 
-    @Positive
-    @NotNull(groups = { Full.class }, message = "Workout id must not be null")
-    public Integer id;
+    // uses a public getter and package private setter so
+    // jackson only serializes ids as responses
+    private Integer id;
 
     public Exercise exercise;
 
@@ -39,16 +38,28 @@ public class Workout implements Entity {
     public String subjectiveEffortType;
 
     @Valid
+    @NotNull
     public List<WorkoutStatistic> statistics;
 
     @AssertTrue(message = "Need workout statistics for every count")
     @SuppressWarnings("unused")
     public boolean checkStatisticsLengthEqualCount() {
+        if (statistics == null) {
+            return false;
+        }
         return count == statistics.size();
     }
 
     @Override
     public Map<String, String> fetchUriKeys() {
         return Map.of("key", id.toString(), "userUsername", userUsername);
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    void setId(Integer newId) {
+        id = newId;
     }
 }

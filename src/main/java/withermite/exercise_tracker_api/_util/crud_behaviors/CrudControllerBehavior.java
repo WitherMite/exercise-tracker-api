@@ -9,7 +9,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import withermite.exercise_tracker_api._util.ResourceWrapper;
 
-public class CrudControllerBehavior<E extends Entity, S extends CrudService<E>> {
+public class CrudControllerBehavior<E extends Entity, S extends CrudService<E, T>, T> {
     private final S service;
     private final int defaultPageSize;
     private final String resourceUri;
@@ -30,19 +30,20 @@ public class CrudControllerBehavior<E extends Entity, S extends CrudService<E>> 
     }
 
     public ResponseEntity<E> create(E entity) {
+        E newEntity = service.create(entity);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{key}").buildAndExpand(entity.fetchUriKeys()).toUri();
+                .path("/{key}").buildAndExpand(newEntity.fetchUriKeys()).toUri();
 
-        return ResponseEntity.created(location).body(service.create(entity));
+        return ResponseEntity.created(location).body(newEntity);
     }
 
-    public ResponseEntity<E> getOne(String key) {
+    public ResponseEntity<E> getOne(T key) {
         E entity = service.findOne(key);
 
         return ResponseEntity.ok().body(entity);
     }
 
-    public ResponseEntity<E> replace(String key, E entity) {
+    public ResponseEntity<E> replace(T key, E entity) {
         ResourceWrapper<E> replaced = service.replace(key, entity);
         E replacedEntity = replaced.resource;
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -52,7 +53,7 @@ public class CrudControllerBehavior<E extends Entity, S extends CrudService<E>> 
             return ResponseEntity.created(location).body(replacedEntity);
         }
 
-        if (!key.equals(replacedEntity.fetchUriKeys().get("key"))) {
+        if (!key.toString().equals(replacedEntity.fetchUriKeys().get("key"))) {
             return ResponseEntity.status(HttpStatus.SEE_OTHER)
                     .header("Location", location.toString())
                     .body(replacedEntity);
@@ -61,10 +62,10 @@ public class CrudControllerBehavior<E extends Entity, S extends CrudService<E>> 
         return ResponseEntity.ok().body(replacedEntity);
     }
 
-    public ResponseEntity<E> update(String key, E entity) {
+    public ResponseEntity<E> update(T key, E entity) {
         E newEntity = service.update(key, entity);
 
-        if (!key.equals(newEntity.fetchUriKeys().get("key"))) {
+        if (!key.toString().equals(newEntity.fetchUriKeys().get("key"))) {
             URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path(resourceUri + "/{key}").buildAndExpand(newEntity.fetchUriKeys()).toUri();
 
@@ -76,7 +77,7 @@ public class CrudControllerBehavior<E extends Entity, S extends CrudService<E>> 
         return ResponseEntity.ok().body(newEntity);
     }
 
-    public ResponseEntity<Void> delete(String key) {
+    public ResponseEntity<Void> delete(T key) {
         service.delete(key);
         return ResponseEntity.noContent().build();
     }

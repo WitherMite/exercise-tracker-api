@@ -8,7 +8,7 @@ import withermite.exercise_tracker_api._util.ResourceWrapper;
 import withermite.exercise_tracker_api._util.crud_behaviors.CrudService;
 
 @Service
-public class WorkoutsService implements CrudService<Workout> {
+public class WorkoutsService implements CrudService<Workout, Integer> {
     private final WorkoutsRepository workoutsRepository;
 
     public WorkoutsService(WorkoutsRepository workoutsRepository) {
@@ -24,9 +24,8 @@ public class WorkoutsService implements CrudService<Workout> {
     }
 
     @Override
-    public Workout findOne(String key) {
-        Integer intKey = Integer.valueOf(key);
-        return workoutsRepository.getOne(intKey);
+    public Workout findOne(Integer key) {
+        return workoutsRepository.getOne(key);
     }
 
     @Override
@@ -35,20 +34,23 @@ public class WorkoutsService implements CrudService<Workout> {
     }
 
     @Override
-    public ResourceWrapper<Workout> replace(String key, Workout workout) {
-        Integer intKey = Integer.valueOf(key);
-        return workoutsRepository.replace(intKey, workout);
+    public ResourceWrapper<Workout> replace(Integer key, Workout workout) {
+        if (workout.count == null) {
+            workout.count = ((short) workout.statistics.size());
+        }
+        return workoutsRepository.replace(key, workout);
     }
 
     @Override
-    public Workout update(String key, Workout workout) {
-        Integer intKey = Integer.valueOf(key);
-        return workoutsRepository.update(intKey, workout);
+    public Workout update(Integer key, Workout workout) {
+        if (workout.count == null) {
+            workout.count = ((short) workout.statistics.size());
+        }
+        return workoutsRepository.update(key, workout);
     }
 
     @Override
-    public void delete(String key) {
-        Integer intKey = Integer.valueOf(key);
-        workoutsRepository.delete(intKey);
+    public void delete(Integer key) {
+        workoutsRepository.delete(key);
     }
 }
