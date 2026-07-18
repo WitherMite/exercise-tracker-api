@@ -44,9 +44,9 @@
                 "statistics": [
                     {
                         "load": 8.2,
-                        "workTime": 2700000,
+                        "workTime": 2700000.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 6
+                        "subjectiveEffortValue": 6.0
                     }
                 ]
             },
@@ -69,10 +69,10 @@
                 "subjectiveEffortType": "Borg",
                 "statistics": [
                     {
-                        "load": 10,
-                        "workTime": 2820000,
+                        "load": 10.0,
+                        "workTime": 2820000.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 17
+                        "subjectiveEffortValue": 17.0
                     }
                 ]
             },
@@ -112,19 +112,19 @@
                 "subjectiveEffortType": "CR-10",
                 "statistics": [
                     {
-                        "load": 102,
+                        "load": 102.0,
                         "workTime": 5.0,
                         "restLength": "PT5M",
                         "subjectiveEffortValue": 7.0
                     },
                     {
-                        "load": 102,
+                        "load": 102.0,
                         "workTime": 5.0,
                         "restLength": "PT5M",
                         "subjectiveEffortValue": 8.0
                     },
                     {
-                        "load": 102,
+                        "load": 102.0,
                         "workTime": 5.0,
                         "restLength": null,
                         "subjectiveEffortValue": 9.0
@@ -150,22 +150,22 @@
                 "subjectiveEffortType": "CR-10",
                 "statistics": [
                     {
-                        "load": 102,
-                        "workTime": 5,
+                        "load": 102.0,
+                        "workTime": 5.0,
                         "restLength": "PT5M",
-                        "subjectiveEffortValue": 8
+                        "subjectiveEffortValue": 8.0
                     },
                     {
-                        "load": 102,
-                        "workTime": 5,
+                        "load": 102.0,
+                        "workTime": 5.0,
                         "restLength": "PT6M",
-                        "subjectiveEffortValue": 9
+                        "subjectiveEffortValue": 9.0
                     },
                     {
-                        "load": 102,
-                        "workTime": 3,
+                        "load": 102.0,
+                        "workTime": 3.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 10
+                        "subjectiveEffortValue": 10.0
                     }
                 ]
             },
@@ -205,9 +205,9 @@
                 "statistics": [
                     {
                         "load": 8.2,
-                        "workTime": 2700000,
+                        "workTime": 2700000.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 6
+                        "subjectiveEffortValue": 6.0
                     }
                 ]
             },
@@ -231,9 +231,9 @@
                 "statistics": [
                     {
                         "load": 8.2,
-                        "workTime": 2700000,
+                        "workTime": 2700000.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 6
+                        "subjectiveEffortValue": 6.0
                     }
                 ]
             },
@@ -257,9 +257,9 @@
                 "statistics": [
                     {
                         "load": 8.2,
-                        "workTime": 2700000,
+                        "workTime": 2700000.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 6
+                        "subjectiveEffortValue": 6.0
                     }
                 ]
             },
@@ -283,9 +283,9 @@
                 "statistics": [
                     {
                         "load": 8.2,
-                        "workTime": 2700000,
+                        "workTime": 2700000.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 6
+                        "subjectiveEffortValue": 6.0
                     }
                 ]
             },
@@ -309,9 +309,9 @@
                 "statistics": [
                     {
                         "load": 8.2,
-                        "workTime": 2700000,
+                        "workTime": 2700000.0,
                         "restLength": null,
-                        "subjectiveEffortValue": 6
+                        "subjectiveEffortValue": 6.0
                     }
                 ]
             }

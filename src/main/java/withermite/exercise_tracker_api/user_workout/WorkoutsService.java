@@ -35,15 +35,14 @@ public class WorkoutsService implements CrudService<Workout, Integer> {
 
     @Override
     public ResourceWrapper<Workout> replace(Integer key, Workout workout) {
-        if (workout.count == null) {
-            workout.count = ((short) workout.statistics.size());
-        }
         return workoutsRepository.replace(key, workout);
     }
 
     @Override
+    @SuppressWarnings("null") // thinks workout.statistics can never be null,
+                              // though this is a different validation group
     public Workout update(Integer key, Workout workout) {
-        if (workout.count == null) {
+        if (workout.count == null && workout.statistics != null) {
             workout.count = ((short) workout.statistics.size());
         }
         return workoutsRepository.update(key, workout);

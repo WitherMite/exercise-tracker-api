@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import withermite.exercise_tracker_api._util.crud_behaviors.CrudControllerBehavior;
 import withermite.exercise_tracker_api._util.crud_behaviors.PaginationParams;
+import withermite.exercise_tracker_api._util.validation.ValidationGroups.AsDelta;
+import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 
 @RestController
 @RequestMapping("/users/{userUsername}/workouts")
@@ -37,7 +40,7 @@ class WorkoutsController {
     @PostMapping
     public ResponseEntity<Workout> create(
             @PathVariable String userUsername,
-            @RequestBody @Valid Workout workout) {
+            @RequestBody @Validated(Full.class) Workout workout) {
 
         workout.userUsername = userUsername;
         return crud.create(workout);
@@ -52,7 +55,7 @@ class WorkoutsController {
     public ResponseEntity<Workout> replace(
             @PathVariable Integer key,
             @PathVariable String userUsername,
-            @RequestBody @Valid Workout workout) {
+            @RequestBody @Validated(Full.class) Workout workout) {
 
         workout.userUsername = userUsername;
         workout.setId(key);
@@ -63,7 +66,7 @@ class WorkoutsController {
     public ResponseEntity<Workout> update(
             @PathVariable Integer key,
             @PathVariable String userUsername,
-            @RequestBody @Valid Workout workout) {
+            @RequestBody @Validated(AsDelta.class) Workout workout) {
 
         workout.userUsername = userUsername;
         workout.setId(key);

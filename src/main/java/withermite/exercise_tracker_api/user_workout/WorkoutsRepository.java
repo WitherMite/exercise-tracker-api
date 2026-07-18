@@ -60,8 +60,12 @@ public class WorkoutsRepository implements CrudRepository<Workout, Integer> {
     }
 
     @Override
+    @SuppressWarnings("null") // thinks workout.statistics can never be null, doesnt see validation groups
     public Workout update(Integer key, Workout workout) {
         Workout workoutResult = crud.update(key, workout);
+        if (workout.statistics == null) {
+            return workoutResult;
+        }
 
         for (short i = 0; i < workout.statistics.size(); i++) {
             WorkoutStatistic stat = workout.statistics.get(i);
@@ -76,13 +80,17 @@ public class WorkoutsRepository implements CrudRepository<Workout, Integer> {
                     USER_WORKOUT_STATISTIC,
                     USER_WORKOUT_STATISTIC.USER_WORKOUT_ID.eq(stat.workoutId)
                             .and(USER_WORKOUT_STATISTIC.INDEX.eq(stat.index)));
+            // update or do nothing
             if (statRecord == null)
                 continue;
 
+            statRecord.from(stat);
             statRecord.update();
-            workoutResult.statistics.add(
-                    statRecord.getIndex(),
-                    statRecord.into(WorkoutStatistic.class));
+
+            if (workoutResult.statistics.get(i) != null) {
+                workoutResult.statistics.remove(i);
+            }
+            workoutResult.statistics.add(i, statRecord.into(WorkoutStatistic.class));
         }
 
         return workoutResult;
@@ -110,16 +118,17 @@ public class WorkoutsRepository implements CrudRepository<Workout, Integer> {
                     USER_WORKOUT_STATISTIC,
                     USER_WORKOUT_STATISTIC.USER_WORKOUT_ID.eq(stat.workoutId)
                             .and(USER_WORKOUT_STATISTIC.INDEX.eq(stat.index)));
-
+            // create or replace
             if (statRecord == null) {
                 statRecord = create.newRecord(USER_WORKOUT_STATISTIC, stat);
                 statRecord.store();
             } else {
+                statUnmapper.unmapDiff(stat, statRecord);
                 statRecord.update();
+                workoutResult.resource.statistics.remove(i);
             }
 
-            statUnmapper.unmapDiff(stat, statRecord);
-            workoutResult.resource.statistics.add(i, stat);
+            workoutResult.resource.statistics.add(i, statRecord.into(WorkoutStatistic.class));
         }
 
         return workoutResult;

@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import withermite.exercise_tracker_api._util.crud_behaviors.Entity;
+import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 import withermite.exercise_tracker_api._util.validation.constraints.IsEnumType;
 import withermite.exercise_tracker_api.exercise.Exercise;
 
@@ -38,10 +39,10 @@ public class Workout implements Entity {
     public String subjectiveEffortType;
 
     @Valid
-    @NotNull
+    @NotNull(groups = Full.class)
     public List<WorkoutStatistic> statistics;
 
-    @AssertTrue(message = "Need workout statistics for every count")
+    @AssertTrue(message = "Need workout statistics for every count", groups = Full.class)
     @SuppressWarnings("unused")
     public boolean checkStatisticsLengthEqualCount() {
         if (statistics == null) {
