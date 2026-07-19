@@ -27,20 +27,19 @@ public class ExerciseTypeUnmapper
         if (record == null)
             return;
 
-        if (exerciseType.name != null && !record.getExerciseTypeName().equals(exerciseType.name))
+        if (exerciseType.name != null)
             record.setExerciseTypeName(exerciseType.name);
 
-        if (exerciseType.countType != null && !record.getCountType().getLiteral().equals(exerciseType.countType))
+        if (exerciseType.countType != null)
             record.setCountType(CountTypeEnum.lookupLiteral(exerciseType.countType));
 
-        if (exerciseType.loadType != null && !record.getLoadType().getLiteral().equals(exerciseType.loadType))
+        if (exerciseType.loadType != null)
             record.setLoadType(LoadTypeEnum.lookupLiteral(exerciseType.loadType));
 
-        if (exerciseType.workTimeType != null
-                && !record.getWorkTimeType().getLiteral().equals(exerciseType.workTimeType))
+        if (exerciseType.workTimeType != null)
             record.setWorkTimeType(WorkTimeTypeEnum.lookupLiteral(exerciseType.workTimeType));
 
-        if (exerciseType.restType != null && !record.getRestType().getLiteral().equals(exerciseType.restType))
+        if (exerciseType.restType != null)
             record.setRestType(RestTypeEnum.lookupLiteral(exerciseType.restType));
     }
 

@@ -21,22 +21,19 @@ public class WorkoutStatisticUnmapper
 
     @Override
     public void unmapDiff(WorkoutStatistic workoutStatistic, UserWorkoutStatisticRecord record) {
-        if (record == null) {
+        if (record == null)
             return;
-        }
 
-        if (workoutStatistic.load != null && !record.getLoad().equals(workoutStatistic.load))
+        if (workoutStatistic.load != null)
             record.setLoad(workoutStatistic.load);
 
-        if (workoutStatistic.workTime != null && !record.getWorkTime().equals(workoutStatistic.workTime))
+        if (workoutStatistic.workTime != null)
             record.setWorkTime(workoutStatistic.workTime);
 
-        if (workoutStatistic.restLength != null
-                && !record.getRestLength().toDuration().equals(workoutStatistic.restLength))
+        if (workoutStatistic.restLength != null)
             record.setRestLength(DayToSecond.valueOf(workoutStatistic.restLength));
 
-        if (workoutStatistic.subjectiveEffortValue != null
-                && !record.getSubjectiveEffortValue().equals(workoutStatistic.subjectiveEffortValue))
+        if (workoutStatistic.subjectiveEffortValue != null)
             record.setSubjectiveEffortValue(workoutStatistic.subjectiveEffortValue);
 
     }

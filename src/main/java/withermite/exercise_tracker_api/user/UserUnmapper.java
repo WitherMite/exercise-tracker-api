@@ -21,19 +21,19 @@ public class UserUnmapper implements EntityMerger<User, AppUserRecord>, RecordUn
         if (record == null)
             return;
 
-        if (user.username != null && !record.getUsername().equals(user.username))
+        if (user.username != null)
             record.setUsername(user.username);
 
-        if (user.displayname != null && !record.getDisplayname().equals(user.displayname))
+        if (user.displayname != null)
             record.setDisplayname(user.displayname);
 
-        if (user.role != null && !record.getUserRole().getLiteral().equals(user.role))
+        if (user.role != null)
             record.setUserRole(UserRoleEnum.lookupLiteral(user.role));
 
-        if (user.weight != null && !record.getWeight().equals(user.weight))
+        if (user.weight != null)
             record.setWeight(user.weight);
 
-        if (user.areWorkoutsPublic != null && !record.getAreWorkoutsPublic().equals(user.areWorkoutsPublic))
+        if (user.areWorkoutsPublic != null)
             record.setAreWorkoutsPublic(user.areWorkoutsPublic);
     }
 

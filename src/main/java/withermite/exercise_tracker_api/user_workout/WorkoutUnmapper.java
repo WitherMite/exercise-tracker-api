@@ -23,21 +23,19 @@ public class WorkoutUnmapper
 
     @Override
     public void unmapDiff(Workout workout, UserWorkoutRecord record) {
-        if (record == null) {
+        if (record == null)
             return;
-        }
 
-        if (workout.datetime != null && !record.getDatetime().equals(workout.datetime))
+        if (workout.datetime != null)
             record.setDatetime(workout.datetime);
 
-        if (workout.count != null && !record.getWorkoutCount().equals(workout.count))
+        if (workout.count != null)
             record.setWorkoutCount(workout.count);
 
-        if (workout.notes != null && !record.getNotes().equals(workout.notes))
+        if (workout.notes != null)
             record.setNotes(workout.notes);
 
-        if (workout.subjectiveEffortType != null
-                && !record.getSubjectiveEffortType().getLiteral().equals(workout.subjectiveEffortType))
+        if (workout.subjectiveEffortType != null)
             record.setSubjectiveEffortType(SubjectiveEffortTypeEnum.lookupLiteral(workout.subjectiveEffortType));
     }
 

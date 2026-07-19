@@ -23,10 +23,10 @@ public class ExerciseUnmapper
         if (record == null)
             return;
 
-        if (exercise.name != null && !record.getExerciseName().equals(exercise.name))
+        if (exercise.name != null)
             record.setExerciseName(exercise.name);
 
-        if (exercise.description != null && !record.getDescription().equals(exercise.description))
+        if (exercise.description != null)
             record.setDescription(exercise.description);
 
     }
