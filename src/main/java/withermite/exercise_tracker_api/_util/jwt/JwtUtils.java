@@ -21,7 +21,13 @@ public class JwtUtils {
     private final JWTVerifier verifier;
     private final Duration duration;
 
-    public JwtUtils(@Value("${jwt.secret}") String secret, @Value("${jwt.duration-days}") Long days) {
+    public JwtUtils(@Value("${jwt.secret}") String secret, @Value("${jwt.durationDays}") Long days) {
+        if (secret == null) {
+            throw new RuntimeException("must provide a jwt.secret property");
+        }
+        if (days == null) {
+            throw new RuntimeException("must provide a jwt.durationDays property");
+        }
         this.algorithm = Algorithm.HMAC512(secret);
         this.duration = Duration.ofDays(days);
         this.verifier = JWT.require(this.algorithm).build();

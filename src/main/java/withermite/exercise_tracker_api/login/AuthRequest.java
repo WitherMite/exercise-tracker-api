@@ -1,12 +1,14 @@
 package withermite.exercise_tracker_api.login;
 
+import java.util.Map;
+
 import org.jooq.generated.enums.UserRoleEnum;
 
 import jakarta.validation.constraints.NotBlank;
 import withermite.exercise_tracker_api._util.crud_behaviors.Entity;
 import withermite.exercise_tracker_api._util.validation.constraints.IsEnumType;
 
-public class AuthRequest implements Entity<String> {
+public class AuthRequest implements Entity {
     @NotBlank(message = "Username must not be blank")
     public String username;
 
@@ -17,7 +19,7 @@ public class AuthRequest implements Entity<String> {
     public String role;
 
     @Override
-    public String fetchKeyValue() {
-        return username;
+    public Map<String, String> fetchUriKeys() {
+        return Map.of("key", username);
     }
 }
