@@ -9,17 +9,18 @@ import org.jooq.generated.tables.records.AppUserRecord;
 import org.springframework.stereotype.Repository;
 
 import withermite.exercise_tracker_api._util.ResourceWrapper;
+import withermite.exercise_tracker_api._util.crud_behaviors.CrudRepository;
 import withermite.exercise_tracker_api._util.crud_behaviors.CrudRepositoryBehavior;
 
 @Repository
-public class UsersRepository {
+public class UsersRepository implements CrudRepository<User, String> {
     private final DSLContext create;
     private final CrudRepositoryBehavior<User, AppUserRecord, String> crud;
 
     public UsersRepository(DSLContext dslContext) {
         this.create = dslContext;
         this.crud = new CrudRepositoryBehavior<>(
-                dslContext, APP_USER, APP_USER.USERNAME, User.class, new UserUnmapper());
+                dslContext, APP_USER, APP_USER.USERNAME, User.class, new UserUnmapper(dslContext));
     }
 
     public User save(User user) {

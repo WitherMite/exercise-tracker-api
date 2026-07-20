@@ -1,17 +1,24 @@
 package withermite.exercise_tracker_api.exercise_type;
 
+import org.jooq.DSLContext;
 import org.jooq.RecordUnmapper;
 import org.jooq.exception.MappingException;
 import org.jooq.generated.enums.CountTypeEnum;
 import org.jooq.generated.enums.LoadTypeEnum;
 import org.jooq.generated.enums.RestTypeEnum;
 import org.jooq.generated.enums.WorkTimeTypeEnum;
+import static org.jooq.generated.tables.ExerciseType.EXERCISE_TYPE;
 import org.jooq.generated.tables.records.ExerciseTypeRecord;
 
 import withermite.exercise_tracker_api._util.crud_behaviors.EntityMerger;
 
 public class ExerciseTypeUnmapper
         implements EntityMerger<ExerciseType, ExerciseTypeRecord>, RecordUnmapper<ExerciseType, ExerciseTypeRecord> {
+    private final DSLContext create;
+
+    public ExerciseTypeUnmapper(DSLContext create) {
+        this.create = create;
+    }
 
     @Override
     @SuppressWarnings("null") // thinks fields can never be null, when that is not true, remove while changing
@@ -20,40 +27,43 @@ public class ExerciseTypeUnmapper
         if (record == null)
             return;
 
-        if (exerciseType.name != null && !record.getExerciseTypeName().equals(exerciseType.name))
+        if (exerciseType.name != null)
             record.setExerciseTypeName(exerciseType.name);
 
-        if (exerciseType.countType != null && !record.getCountType().getLiteral().equals(exerciseType.countType))
+        if (exerciseType.countType != null)
             record.setCountType(CountTypeEnum.lookupLiteral(exerciseType.countType));
 
-        if (exerciseType.loadType != null && !record.getLoadType().getLiteral().equals(exerciseType.loadType))
+        if (exerciseType.loadType != null)
             record.setLoadType(LoadTypeEnum.lookupLiteral(exerciseType.loadType));
 
-        if (exerciseType.workTimeType != null
-                && !record.getWorkTimeType().getLiteral().equals(exerciseType.workTimeType))
+        if (exerciseType.workTimeType != null)
             record.setWorkTimeType(WorkTimeTypeEnum.lookupLiteral(exerciseType.workTimeType));
 
-        if (exerciseType.restType != null && !record.getRestType().getLiteral().equals(exerciseType.restType))
+        if (exerciseType.restType != null)
             record.setRestType(RestTypeEnum.lookupLiteral(exerciseType.restType));
     }
 
     @Override
     public ExerciseTypeRecord unmap(ExerciseType exerciseType) throws MappingException {
         try {
-            ExerciseTypeRecord record = new ExerciseTypeRecord();
+            ExerciseTypeRecord record = create.newRecord(EXERCISE_TYPE);
+
             record.setExerciseTypeName(exerciseType.name);
             record.setCountType(CountTypeEnum.lookupLiteral(exerciseType.countType));
             record.setLoadType(LoadTypeEnum.lookupLiteral(exerciseType.loadType));
             record.setWorkTimeType(WorkTimeTypeEnum.lookupLiteral(exerciseType.workTimeType));
+
             if (exerciseType.restType == null) {
                 record.setRestType(RestTypeEnum.lookupLiteral("optional"));
             } else {
                 record.setRestType(RestTypeEnum.lookupLiteral(exerciseType.restType));
             }
+
             return record;
+
         } catch (Exception e) {
             System.err.println(e.toString());
-            throw new MappingException("user could not be mapped to jooq record", e);
+            throw new MappingException("ExerciseType could not be mapped to jooq record", e);
         }
     }
 }

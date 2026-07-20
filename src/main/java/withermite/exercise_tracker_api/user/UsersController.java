@@ -25,7 +25,7 @@ import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 @RequestMapping("/users")
 class UsersController {
     private final String resourceUri = "/users";
-    private final CrudControllerBehavior<User, UsersService> crud;
+    private final CrudControllerBehavior<User, UsersService, String> crud;
 
     public UsersController(UsersService usersService, @Value("${user.defaultPageSize}") int defaultPageSize) {
         this.crud = new CrudControllerBehavior<>(usersService, this.resourceUri, defaultPageSize);
