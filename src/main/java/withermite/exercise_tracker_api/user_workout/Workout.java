@@ -27,22 +27,22 @@ public class Workout implements Entity {
 
     public Exercise exercise;
 
-    @PastOrPresent
+    @PastOrPresent(message = "Datetime must not be in the future")
     public Instant datetime;
 
     public String notes;
 
-    @Positive
+    @Positive(message = "Count should be greater than 0")
     public Short count;
 
     @IsEnumType(enumTypeClass = SubjectiveEffortTypeEnum.class, message = "Subjective effort type must be a valid subjective effort type")
     public String subjectiveEffortType;
 
     @Valid
-    @NotNull(groups = Full.class)
+    @NotNull(groups = Full.class, message = "Must define a statistics array")
     public List<WorkoutStatistic> statistics;
 
-    @AssertTrue(message = "Need workout statistics for every count", groups = Full.class)
+    @AssertTrue(message = "Number of workout statistics should match defined count", groups = Full.class)
     @SuppressWarnings("unused")
     public boolean checkStatisticsLengthEqualCount() {
         if (statistics == null) {

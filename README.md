@@ -1,7 +1,5 @@
 # To do:
 
-- Do request validation the spring way
-    - add messages to every constraint
 - Add other endpoints (features mostly done if didnt miss something, but tests incomplete)
     - test moving exercises to other exercise types, disallow this for user workouts(instead of creating new resource and returning 201)
     - test changing children for coupled 1:many relationships (like lists of workout statistics)

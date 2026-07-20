@@ -17,8 +17,8 @@ import withermite.exercise_tracker_api._util.validation.constraints.NotBlankIfEx
 
 public class ExerciseType implements Entity {
 
-    @NotBlank(message = "Name must not be blank", groups = Full.class)
-    @NotBlankIfExists(message = "Name must not be blank", groups = AsDelta.class)
+    @NotBlank(message = "Exercise type name must not be blank", groups = Full.class)
+    @NotBlankIfExists(message = "Exercise type name must not be blank", groups = AsDelta.class)
     public String name;
 
     @NotNull(message = "Must define a countType", groups = Full.class)
