@@ -7,6 +7,9 @@
     - test changing children for coupled 1:many relationships (like lists of workout statistics)
         - this is tested well enough with json responses in generic integration, should probably check db state though
 - Implement security
+    - protect endpoints
+    - decide how to change user creation to work with security framework
+    - write security tests
 
 ## Low priority:
 
