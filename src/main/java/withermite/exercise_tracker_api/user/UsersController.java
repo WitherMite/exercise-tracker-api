@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +27,12 @@ import withermite.exercise_tracker_api._util.validation.ValidationGroups.Full;
 class UsersController {
     private final String resourceUri = "/users";
     private final CrudControllerBehavior<User, UsersService, String> crud;
+    private final PasswordEncoder encoder;
 
-    public UsersController(UsersService usersService, @Value("${user.defaultPageSize}") int defaultPageSize) {
+    public UsersController(UsersService usersService, PasswordEncoder encoder,
+            @Value("${user.defaultPageSize}") int defaultPageSize) {
         this.crud = new CrudControllerBehavior<>(usersService, this.resourceUri, defaultPageSize);
+        this.encoder = encoder;
     }
 
     @GetMapping
@@ -38,6 +42,7 @@ class UsersController {
 
     @PostMapping
     public ResponseEntity<User> create(@Validated(Full.class) @RequestBody User user) {
+        user.setPassword(encoder.encode(user.getPassword()));
         return crud.create(user);
     }
 
@@ -48,11 +53,15 @@ class UsersController {
 
     @PutMapping("/{key}")
     public ResponseEntity<User> replace(@PathVariable String key, @Validated(Full.class) @RequestBody User user) {
+        user.setPassword(encoder.encode(user.getPassword()));
         return crud.replace(key, user);
     }
 
     @PatchMapping("/{key}")
     public ResponseEntity<User> update(@PathVariable String key, @Validated(AsDelta.class) @RequestBody User user) {
+        if (user.getPassword() != null) {
+            user.setPassword(encoder.encode(user.getPassword()));
+        }
         return crud.update(key, user);
     }
 

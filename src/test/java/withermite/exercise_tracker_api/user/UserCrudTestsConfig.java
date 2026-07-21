@@ -15,6 +15,7 @@ public class UserCrudTestsConfig implements CrudIntegrationTestsConfig {
         return Map.of(
                 "id", Integer.class,
                 "username", String.class,
+                "pw_hash", String.class,
                 "displayname", String.class,
                 "user_role", String.class,
                 "are_workouts_public", Boolean.class,

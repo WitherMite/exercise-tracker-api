@@ -24,6 +24,9 @@ public class UserUnmapper implements EntityMerger<User, AppUserRecord>, RecordUn
         if (user.username != null)
             record.setUsername(user.username);
 
+        if (user.getPassword() != null)
+            record.setPwHash(user.getPassword());
+
         if (user.displayname != null)
             record.setDisplayname(user.displayname);
 
@@ -42,6 +45,7 @@ public class UserUnmapper implements EntityMerger<User, AppUserRecord>, RecordUn
         try {
             AppUserRecord record = create.newRecord(APP_USER);
             record.setUsername(user.username);
+            record.setPwHash(user.getPassword());
             record.setDisplayname(user.displayname);
             record.setWeight(user.weight);
             if (user.role == null) {

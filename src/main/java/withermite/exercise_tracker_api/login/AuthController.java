@@ -4,8 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,10 +32,13 @@ public class AuthController {
     }
 
     @PostMapping
-    public ResponseEntity<?> authenticate(@Valid @RequestBody AuthRequest req) {
+    public ResponseEntity<Object> authenticate(@Valid @RequestBody AuthRequest req) {
         try {
+            // run to check that credentials exist,
+            // but dont populate token with the return value
+            // as it sanitizes the password hash off the returned authentication
             authManager.authenticate(new UsernamePasswordAuthenticationToken(req.username, req.password));
-        } catch (BadCredentialsException e) {
+        } catch (AuthenticationException e) {
             ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
         }
@@ -45,11 +48,4 @@ public class AuthController {
 
         return ResponseEntity.ok(new ResponseToken(token));
     }
-
-    // @PostMapping("/register")
-    // public ResponseEntity<ResponseToken> register(@Valid @RequestBody
-    // LoginRequest req) {
-    // return ResponseEntity.ok(new ResponseToken(""));
-    // }
-
 }

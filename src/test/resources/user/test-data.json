@@ -31,6 +31,7 @@
             "keyValue": "frank",
             "original": {
                 "username": "frank",
+                "password": "asfdeas",
                 "displayname": "Frank",
                 "role": "admin",
                 "weight": 65.2,
@@ -38,6 +39,7 @@
             },
             "alternateValues": {
                 "username": "frank",
+                "password": "asfdeas",
                 "displayname": "Frank69",
                 "role": "default",
                 "weight": 75,
@@ -62,6 +64,7 @@
             "keyValue": "bob",
             "original": {
                 "username": "bob",
+                "password": "asfdeas",
                 "displayname": "Bob",
                 "role": "admin",
                 "weight": 72.4,
@@ -69,6 +72,7 @@
             },
             "alternateValues": {
                 "username": "bob",
+                "password": "asfdeas",
                 "displayname": "Bob",
                 "role": "default",
                 "weight": 75,
