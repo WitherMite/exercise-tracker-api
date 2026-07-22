@@ -3,15 +3,15 @@
 - Implement security
     - protect endpoints
         - change test template to obtain and provide relevant authentication/authorization for resources
+            - can actually leave this as is, with a mock web environment the test client is ignoring security filters and i can test the functionality easily, just need separate tests with a correctly configured client to test that endpoints are protected in a real app context
         - may just leave this to one super strict global auth until i feel i want to ever expose this api to any clients other than a specific frontend i write
+    - customize security error handling
     - decide how to change user creation to work with security framework
         - completely rewrite user endpoint
             - remove from general integration testing template and give it a custom suite
                 - maybe let test template be configured to skip unsupported http methods so is not completely useless when not all are provided?
                     - also would need to allow to configure json fields that are request or response only (already had to hack around this for user workouts), though i had made the data structure independent of this so could be difficult
     - write specific security tests
-    - may consider dropping my custom impl of jwt without 3rd party auth server for Oauth2 package one
-        - https://github.com/spring-projects/spring-security-samples/tree/main/servlet/spring-boot/java/jwt/login
 - Add other endpoints (features mostly done if didnt miss something, but tests incomplete)
     - test moving exercises to other exercise types, disallow this for user workouts(instead of creating new resource and returning 201)
     - test changing children for coupled 1:many relationships (like lists of workout statistics)

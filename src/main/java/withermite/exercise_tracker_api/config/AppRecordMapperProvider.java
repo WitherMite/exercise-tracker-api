@@ -11,6 +11,8 @@ import withermite.exercise_tracker_api.exercise.Exercise;
 import withermite.exercise_tracker_api.exercise.ExerciseMapper;
 import withermite.exercise_tracker_api.exercise_type.ExerciseType;
 import withermite.exercise_tracker_api.exercise_type.ExerciseTypeMapper;
+import withermite.exercise_tracker_api.login.AuthMapper;
+import withermite.exercise_tracker_api.login.AuthRequest;
 import withermite.exercise_tracker_api.user.User;
 import withermite.exercise_tracker_api.user.UserMapper;
 import withermite.exercise_tracker_api.user_workout.Workout;
@@ -25,6 +27,7 @@ public class AppRecordMapperProvider implements RecordMapperProvider {
     private final ExerciseMapper exerciseMapper = new ExerciseMapper();
     private final WorkoutMapper workoutMapper = new WorkoutMapper();
     private final WorkoutStatisticMapper workoutStatisticMapper = new WorkoutStatisticMapper();
+    private final AuthMapper authMapper = new AuthMapper();
 
     public AppRecordMapperProvider(Configuration config) {
         this.config = config;
@@ -49,6 +52,9 @@ public class AppRecordMapperProvider implements RecordMapperProvider {
         }
         if (WorkoutStatistic.class.isAssignableFrom(type)) {
             return (RecordMapper<R, E>) workoutStatisticMapper;
+        }
+        if (AuthRequest.class.isAssignableFrom(type)) {
+            return (RecordMapper<R, E>) authMapper;
         }
         return new DefaultRecordMapper<>(recordType, type, config);
     }

@@ -4,8 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,8 +38,9 @@ public class AuthController {
             // but dont populate token with the return value
             // as it sanitizes the password hash off the returned authentication
             authManager.authenticate(new UsernamePasswordAuthenticationToken(req.username, req.password));
-        } catch (AuthenticationException e) {
+        } catch (BadCredentialsException e) {
             ProblemDetail problem = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
+            System.err.println(e);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problem);
         }
 

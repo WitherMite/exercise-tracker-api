@@ -14,7 +14,8 @@ public class AuthRepository {
 
     public AuthRepository(DSLContext dslContext) {
         this.crud = new CrudRepositoryBehavior<>(
-                dslContext, APP_USER, APP_USER.USERNAME, AuthRequest.class, new AuthUnmapper());
+                dslContext, APP_USER, APP_USER.USERNAME, AuthRequest.class, null); // will not be capable of editing
+                                                                                   // without unmapper, but is fine here
     }
 
     public AuthRequest getOne(String username) {
