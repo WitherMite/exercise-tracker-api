@@ -37,6 +37,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 auth -> auth.requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                        .requestMatchers("/exercise-types/**").hasAuthority("admin")
                         .requestMatchers("/**").hasAnyAuthority("default", "admin"))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(crsf -> crsf.disable())

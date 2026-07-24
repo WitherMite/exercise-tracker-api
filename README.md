@@ -5,6 +5,7 @@
         - change test template to obtain and provide relevant authentication/authorization for resources
             - can actually leave this as is, with a mock web environment the test client is ignoring security filters and i can test the functionality easily, just need separate tests with a correctly configured client to test that endpoints are protected in a real app context
         - may just leave this to one super strict global auth until i feel i want to ever expose this api to any clients other than a specific frontend i write
+        - add checks to services to protect specific fields to correct authorization
     - customize security error handling
     - decide how to change user creation to work with security framework
         - completely rewrite user endpoint
